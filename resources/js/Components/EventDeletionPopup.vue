@@ -1,26 +1,30 @@
 <template>
-    <div>
-        <div :class="modalClasses" id="popup-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative w-full max-w-md max-h-full">
-                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    <button @click="hideModal" type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+    <div class="fixed w-full h-full top-0 left-0 flex items-center justify-center z-10" v-if="open">
+        <div class="absolute w-full h-full bg-gray-900 opacity-50" @click="close"></div>
+
+        <div class="absolute max-h-full" :class="maxWidth">
+            <div class="container bg-white overflow-hidden md:rounded">
+                <div class="px-4 py-4 flex justify-between items-start">
+                    <div class="mr-4">
+                        <svg class="fill-current h-5 md:h-6 w-5 md:w-6 md:mr-1" xmlns="http://www.w3.org/2000/svg" :class="color" viewBox="0 0 20 20">
+                            <path v-if="type === 'info'" d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z" />
+                            <path v-if="type === 'warning'" d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 5h2v6H9V5zm0 8h2v2H9v-2z" />
+                            <path v-if="type === 'success'" d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM6.7 9.29L9 11.6l4.3-4.3 1.4 1.42L9 14.4l-3.7-3.7 1.4-1.42z" />
+                            <path v-if="type === 'danger'" d="M0 10a10 10 0 1 1 20 0 10 10 0 0 1-20 0zm16.32-4.9L5.09 16.31A8 8 0 0 0 16.32 5.09zm-1.41-1.42A8 8 0 0 0 3.68 14.91L14.91 3.68z" />
                         </svg>
-                        <span class="sr-only">Close modal</span>
-                    </button>
-                    <div class="p-6 text-center">
-                        <svg class="mx-auto mb-4 text-gray-400 w-12 h-12 dark:text-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                        </svg>
-                        <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this product?</h3>
-                        <button @click="acceptAction" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                            Yes, I'm sure
-                            <span v-if="remainingTime > 0" class="ml-2 text-gray-500">{{ remainingTime }}s</span>
-                        </button>
-                        <button @click="hideModal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
-                            No, cancel
-                        </button>
+                    </div>
+
+                    <div class="max-h-full">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-semibold" :class="color">{{ title }}</h3>
+
+                            <div @click="close" class="text-2xl hover:text-gray-600 text-gray-500 cursor-pointer select-none flex leading-none">
+                                &#215;
+                            </div>
+                        </div>
+
+                        <!-- Content Slot-->
+                        <slot></slot>
                     </div>
                 </div>
             </div>
@@ -29,58 +33,96 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-
 export default {
     data() {
         return {
-            showModal: false,
-            remainingTime: 10, // The time in seconds
-            timerId: null,
+            open: true,
         };
     },
-    computed: {
-        modalClasses() {
-            return {
-                'hidden': !this.showModal,
-            };
+    props: {
+        type: {
+            type: String,
+            default: "info",
+        },
+        title: {
+            type: String,
+            default: "",
+        },
+        header: {
+            type: String,
+            required: false,
+            default: "",
+        },
+        width: {
+            type: String,
+            default: "full",
+            validator: (value) => ["xs", "sm", "md", "lg", "full"].indexOf(value) !== -1,
         },
     },
     methods: {
-        showModal() {
-            this.showModal = true;
-            this.startCountdown();
+        close() {
+            this.open = false;
+            this.$emit("close");
         },
-        hideModal() {
-            this.showModal = false;
-            this.remainingTime = 10;
-            this.stopCountdown();
-        },
-        acceptAction() {
-            // Perform the accept action (e.g., delete the product)
-            // Add your logic here
-
-            // Then, hide the modal
-            this.hideModal();
-        },
-        startCountdown() {
-            this.timerId = setInterval(() => {
-                if (this.remainingTime > 0) {
-                    this.remainingTime--;
-                } else {
-                    this.acceptAction();
-                }
-            }, 1000);
-        },
-        stopCountdown() {
-            if (this.timerId) {
-                clearInterval(this.timerId);
-                this.timerId = null;
+    },
+    computed: {
+        maxWidth() {
+            switch (this.width) {
+                case "xs":
+                    return "max-w-lg";
+                case "sm":
+                    return "max-w-xl";
+                case "md":
+                    return "max-w-2xl";
+                case "lg":
+                    return "max-w-3xl";
+                case "full":
+                    return "max-w-full";
             }
         },
+        shade() {
+            switch (this.type) {
+                case "info":
+                    return "gray";
+                case "warning":
+                    return "yellow";
+                case "success":
+                    return "teal";
+                case "danger":
+                    return "red";
+            }
+        },
+        color() {
+            return `text-${this.shade}-600`;
+        },
     },
-    beforeUnmount() {
-        this.stopCountdown();
+    mounted() {
+        const onEscape = (e) => {
+            if (e.key === "Esc" || e.key === "Escape") {
+                this.close();
+            }
+        };
+
+        document.addEventListener("keydown", onEscape);
+
+        // Instead of using $once, use the beforeUnmount lifecycle hook to remove the event listener.
+        // Setup the beforeUnmount hook
+        this.beforeUnmount = () => {
+            document.removeEventListener("keydown", onEscape);
+        };
     },
+    // mounted() {
+    //     const onEscape = (e) => {
+    //         if (e.key === "Esc" || e.key === "Escape") {
+    //             this.close();
+    //         }
+    //     };
+    //
+    //     document.addEventListener("keydown", onEscape);
+    //
+    //     this.$once("hook:beforeDestroy", () => {
+    //         document.removeEventListener("keydown", onEscape);
+    //     });
+    // },
 };
 </script>
