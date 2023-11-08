@@ -46,7 +46,7 @@
 
                             <EventDeletionPopup v-if="showModal" type="danger" title="Confirm Action" width="sm" v-on:close="closeDeleteModal()">
                                 <p class="text-gray-800">
-                                    Are you sure you want you delete your account? This action cannot be undone.
+                                    Are you sure you want you delete your event? This action cannot be undone.
                                 </p>
 
                                 <div class="text-right mt-4">
@@ -84,7 +84,7 @@ import {usePage} from '@inertiajs/vue3';
 import axios from 'axios';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import SeatMap from "@/Pages/Events/SeatMap.vue";
-import EventDeletionPopup from "@/Components/EventDeletionPopup.vue";
+import EventDeletionPopup from "@/Components/DangerousActionConfirmation.vue";
 
 export default {
     components: {

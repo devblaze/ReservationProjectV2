@@ -105,24 +105,9 @@ export default {
 
         document.addEventListener("keydown", onEscape);
 
-        // Instead of using $once, use the beforeUnmount lifecycle hook to remove the event listener.
-        // Setup the beforeUnmount hook
         this.beforeUnmount = () => {
             document.removeEventListener("keydown", onEscape);
         };
     },
-    // mounted() {
-    //     const onEscape = (e) => {
-    //         if (e.key === "Esc" || e.key === "Escape") {
-    //             this.close();
-    //         }
-    //     };
-    //
-    //     document.addEventListener("keydown", onEscape);
-    //
-    //     this.$once("hook:beforeDestroy", () => {
-    //         document.removeEventListener("keydown", onEscape);
-    //     });
-    // },
 };
 </script>
