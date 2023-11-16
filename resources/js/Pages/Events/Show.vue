@@ -57,7 +57,7 @@
                                         :class="{ 'cursor-not-allowed opacity-50': deleteButtonDisabled }"
                                         class="mr-2 px-4 py-2 text-sm rounded text-white bg-red-500 focus:outline-none hover:bg-red-400"
                                         :disabled="deleteButtonDisabled">
-                                        Delete {{ countdown !== 10 ? `(${countdown})` : '' }}
+                                        Delete {{ countdown < countdownReset ? `(${countdown})` : '' }}
                                     </button>
                                 </div>
                             </EventDeletionPopup>
@@ -80,7 +80,7 @@
 
 <script>
 import {ref, onMounted} from 'vue';
-import {usePage} from '@inertiajs/vue3';
+import {usePage, router} from '@inertiajs/vue3';
 import axios from 'axios';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import SeatMap from "@/Pages/Events/SeatMap.vue";
@@ -98,7 +98,8 @@ export default {
             isSeatMapVisible: false,
             showModal: false,
             deleteButtonDisabled: true,
-            countdown: 10,
+            countdown: 1,
+            countdownReset: 2
         };
     },
     props: {
@@ -135,40 +136,52 @@ export default {
                 } else {
                     clearInterval(countdownInterval);
                     this.deleteButtonDisabled = false;
-                    this.countdown = 10;
+                    this.countdown = this.countdownReset;
                 }
             }, 1000)
         },
-        deleteEvent() {
+        async deleteEvent() {
+            try {
+                axios.delete(`/events/${this.event.id}`)
+                    .then(response => {
+                        console.log('Status:', response.data.success);
 
+                        setTimeout(() => {
+                            router.visit(route('events.index'))
+                        }, 2000);
+                    })
+                    .catch(error => console.log(error));
+            } catch (error) {
+                console.error('Error deleting event:', error);
+            }
         }
     },
 
-    setup() {
-        const {event} = usePage();
-
-        // Function to reserve a seat for the event
-        const reserveSeat = async () => {
-            try {
-                // Make an HTTP POST request to create a reservation
-                const response = await axios.post(route('reservations.store', { event: event.id }));
-
-                // Handle the response and update the isReserved flag
-                if (response.status === 200) {
-                    this.hasReservedSeat = true;
-                } else {
-                    // Handle errors or display a message
-                    console.error('Reservation failed.');
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        // Check if the user has already reserved a seat when the component is mounted
-        onMounted(() => {
-            this.hasReservedSeat = false;
-        });
-    },
+    // setup() {
+    //     const {event} = usePage();
+    //
+    //     // Function to reserve a seat for the event
+    //     const reserveSeat = async () => {
+    //         try {
+    //             // Make an HTTP POST request to create a reservation
+    //             const response = await axios.post(route('reservations.store', { event: event.id }));
+    //
+    //             // Handle the response and update the isReserved flag
+    //             if (response.status === 200) {
+    //                 this.hasReservedSeat = true;
+    //             } else {
+    //                 // Handle errors or display a message
+    //                 console.error('Reservation failed.');
+    //             }
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     };
+    //
+    //     // Check if the user has already reserved a seat when the component is mounted
+    //     onMounted(() => {
+    //         this.hasReservedSeat = false;
+    //     });
+    // },
 };
 </script>

@@ -114,26 +114,26 @@ class EventController extends Controller
      *
      * @param EventRequest $request
      * @param Event $event
-     * @return RedirectResponse
+     * @return JsonResponse
      */
-    public function update(EventRequest $request, Event $event): RedirectResponse
+    public function update(EventRequest $request, Event $event): JsonResponse
     {
         $event->update($request->validated());
 
-        return redirect()->route('events.show', $event)->with('success', 'Event updated successfully.');
+        return response()->json(['success' => 'Event updated successfully.']);
     }
 
     /**
      * Remove the specified event from storage.
      *
      * @param Event $event
-     * @return RedirectResponse
+     * @return JsonResponse
      */
-    public function destroy(Event $event): RedirectResponse
+    public function destroy(Event $event): JsonResponse
     {
         $event->delete();
 
-        return redirect()->route('events.index')->with('success', 'Event deleted successfully.');
+        return response()->json(['success' => 'Event deleted successfully.']);
     }
 
     /**
