@@ -20,6 +20,7 @@ class Event extends Model
         'description',
         'date',
         'location',
+        'is_canceled',
         'organizer_id',
     ];
 

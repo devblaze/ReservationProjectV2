@@ -37,7 +37,7 @@
                                     <input type="text" id="location" v-model="event.location" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Event Location" required>
                                 </div>
 
-                                <CreateSeatMap></CreateSeatMap>
+                                <CreateSeatMap @update-layout="handleSeatMapUpdate"></CreateSeatMap>
 
                                 <!-- Submit button -->
                                 <button type="submit" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Create Event</button>
@@ -57,7 +57,10 @@ import axios from "axios";
 import CreateSeatMap from "@/Components/CreateSeatMap.vue";
 
 export default {
-    components: {CreateSeatMap, AuthenticatedLayout},
+    components: {
+        CreateSeatMap,
+        AuthenticatedLayout
+    },
     data() {
         return {
             event: {
@@ -82,6 +85,10 @@ export default {
                     // Handle errors, e.g., show an error message
                     console.error(error);
                 });
+        },
+        handleSeatMapUpdate(newLayout) {
+            // Assuming you want to store this in the event object
+            this.event.seatMapLayout = newLayout;
         },
     },
 };

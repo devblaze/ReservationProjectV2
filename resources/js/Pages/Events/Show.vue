@@ -113,7 +113,13 @@ export default {
             this.isSeatMapVisible = false;
         },
         cancelEvent() {
-            console.log('test')
+            axios.put(route('events.update', this.event.id), { is_canceled: true })
+                .then(response => {
+                    console.log('Event canceled:', response.data.success);
+
+                    this.event.is_canceled = true;
+                })
+                .catch(error => console.log(error))
         },
         reserveSeat(seats) {
             // Handle the reserved seats data (e.g., send an API request to create reservations)
@@ -141,19 +147,15 @@ export default {
             }, 1000)
         },
         async deleteEvent() {
-            try {
-                axios.delete(`/events/${this.event.id}`)
-                    .then(response => {
-                        console.log('Status:', response.data.success);
+            axios.delete(route('events.destroy', this.event.id))
+                .then(response => {
+                    console.log('Status:', response.data.success);
 
-                        setTimeout(() => {
-                            router.visit(route('events.index'))
-                        }, 2000);
-                    })
-                    .catch(error => console.log(error));
-            } catch (error) {
-                console.error('Error deleting event:', error);
-            }
+                    setTimeout(() => {
+                        router.visit(route('events.index'))
+                    }, 2000);
+                })
+                .catch(error => console.log(error));
         }
     },
 

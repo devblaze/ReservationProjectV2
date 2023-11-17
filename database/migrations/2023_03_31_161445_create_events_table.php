@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->dateTime('date');
             $table->string('location');
+            $table->boolean('is_canceled');
             $table->timestamps();
             $table->foreign('organizer_id')
                 ->references('id')
