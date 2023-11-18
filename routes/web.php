@@ -40,7 +40,7 @@ Route::middleware('auth')->group(function () {
 // Events
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::middleware(['auth'])->group(function () {
-//    Route::get('/events/{user}', [EventController::class, 'userIndex'])->name('events.user.index');
+//    Route::post('/events/create', [EventController::class, 'store'])->name('events.store');
     Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');

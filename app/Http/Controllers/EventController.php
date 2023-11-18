@@ -49,14 +49,10 @@ class EventController extends Controller
      * Store a newly created event in storage.
      *
      * @param EventRequest $request
-     * @return JsonResponse|RedirectResponse
+     * @return JsonResponse
      */
-    public function store(EventRequest $request): JsonResponse | RedirectResponse
+    public function store(EventRequest $request): JsonResponse
     {
-        return redirect()->route('events.index');
-        //        $event = Event::create($request->validated());
-//
-//        return redirect()->route('events.show', $event)->with('success', 'Event created successfully.');
         $user = Auth::user();
 
         if (!$user) {
@@ -79,9 +75,8 @@ class EventController extends Controller
             'organizer_id' => $user->id
         ]);
 
-        return redirect()->route('events.index')->with('success', 'Event created successfully')->send();
+        return response()->json(['message' => 'Event created!']);
     }
-
 
     /**
      * Display the specified event.

@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import {router} from '@inertiajs/vue3';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import axios from "axios";
 import CreateSeatMap from "@/Components/CreateSeatMap.vue";
@@ -70,24 +70,21 @@ export default {
                 start_date: '',
                 end_date: '',
                 location: '',
-
             },
         };
     },
     methods: {
         createEvent() {
-            axios.post('/events', this.event)
+            axios.post(route('events.store'), this.event)
                 .then(response => {
-                    // Handle the response, e.g., show a success message
                     console.log(response.data);
+                    // router.visit(route('events.index'))
                 })
                 .catch(error => {
-                    // Handle errors, e.g., show an error message
                     console.error(error);
                 });
         },
         handleSeatMapUpdate(newLayout) {
-            // Assuming you want to store this in the event object
             this.event.seatMapLayout = newLayout;
         },
     },
