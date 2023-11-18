@@ -24,6 +24,11 @@ class EventController extends Controller
         $search = $request->input('search', '');
         $events = Event::search($search)->paginate(16);
 
+        $events->getCollection()->transform(function ($event) {
+            $event->url = route('events.show', $event->id);
+            return $event;
+        });
+
         // Check if it's an API request, and return JSON data if so
         if ($request->wantsJson()) {
             return response()->json($events);

@@ -78,7 +78,7 @@ export default {
             axios.post(route('events.store'), this.event)
                 .then(response => {
                     console.log(response.data);
-                    // router.visit(route('events.index'))
+                    router.visit(route('events.index'))
                 })
                 .catch(error => {
                     console.error(error);
