@@ -101,6 +101,7 @@ import axios from 'axios';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import SeatMap from "@/Pages/Events/SeatMap.vue";
 import EventDeletionPopup from "@/Components/DangerousActionConfirmation.vue";
+import {sendNotification} from "@/Components/notificationService";
 
 export default {
     components: {
@@ -166,12 +167,15 @@ export default {
             axios.delete(route('events.destroy', this.event.id))
                 .then(response => {
                     console.log('Status:', response.data.success);
-
+                    sendNotification({ message: 'Event deleted successfully!'}, 'success')
                     setTimeout(() => {
                         router.visit(route('events.index'))
-                    }, 2000);
+                    }, 1000);
                 })
-                .catch(error => console.log(error));
+                .catch(error => {
+                    console.log(error)
+                        sendNotification({ message: 'Event deleted successfully!'}, 'danger')
+                });
         }
     },
 

@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import {Link} from '@inertiajs/vue3';
-
+import NotificationAlert from "@/Components/NotificationAlert.vue";
+import {notifications, removeNotification} from "@/Components/notificationService";
 
 const showingNavigationDropdown = ref(false);
 </script>
@@ -39,9 +40,9 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('events.create')" :active="route().current('events.create')">
                                     Create Event
                                 </NavLink>
-<!--                                <NavLink :href="route('reservations.create')" :active="route().current('reservations.create')">-->
-<!--                                    Manage Events-->
-<!--                                </NavLink>-->
+                                <!--                                <NavLink :href="route('reservations.create')" :active="route().current('reservations.create')">-->
+                                <!--                                    Manage Events-->
+                                <!--                                </NavLink>-->
                             </div>
                         </div>
 
@@ -166,6 +167,16 @@ const showingNavigationDropdown = ref(false);
             <main>
                 <slot/>
             </main>
+            <div class="fixed bottom-0 right-0 p-4 space-y-4 notification-container">
+                <NotificationAlert
+                    v-for="notification in notifications"
+                    :key="notification.id"
+                    :type="notification.type"
+                    @close="removeNotification(notification.id)"
+                >
+                    {{ notification.message }}
+                </NotificationAlert>
+            </div>
         </div>
     </div>
 </template>
