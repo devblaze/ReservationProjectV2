@@ -24,8 +24,10 @@ class EventFactory extends Factory
             'organizer_id' => User::factory(),
             'name' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
-            'date' => $this->faker->dateTimeBetween('-1 month', '+6 months'),
+            'start_date' => $this->faker->dateTimeBetween('+2 days', '+2 week'),
+            'end_date' => $this->faker->dateTimeBetween('+1 week', '+2 week'),
             'location' => $this->faker->address,
+            'is_canceled' => $this->faker->boolean,
         ];
     }
 }

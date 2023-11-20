@@ -122,8 +122,6 @@ export default {
             return format(new Date(date), 'HH:mm'); // e.g., 15:00
         },
         displayDateTime(event) {
-            event.start_date = event.date;
-            event.end_date = event.date;
             const startDate = new Date(event.start_date);
             const endDate = event.end_date ? new Date(event.end_date) : null;
 

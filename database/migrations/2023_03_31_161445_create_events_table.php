@@ -16,14 +16,11 @@ return new class extends Migration
             $table->unsignedBigInteger('organizer_id');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->dateTime('date');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
             $table->string('location');
             $table->boolean('is_canceled');
             $table->timestamps();
-            $table->foreign('organizer_id')
-                ->references('id')
-                ->on('users')
-                ->onDelete('cascade');
         });
     }
 
