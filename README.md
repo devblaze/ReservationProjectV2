@@ -88,9 +88,6 @@ The application will be accessible at `http://localhost`.
 For now we have only end-to-end tests you can download the standalone cypress from [here](https://www.cypress.io/).
 
 Create a new project and place the `eventManagment.cy.js` from the project `/ReservationProjectV2/tests/cypress/e2e`.
-### Cypress Tests
-To run Cypress tests, first ensure the development server is running.
-Open Cypress Test Runner:
 
 ## Built With
 
@@ -110,7 +107,7 @@ For the versions available, see the [tags on this repository](https://github.com
 
 ## Authors
 
-- **Your Name** - _Initial work_ - [Nick Antoniadis](https://github.com/devblaze)
+- **Nikolaos Christos Antoniadis** - _Initial work_ - [Nick Antoniadis](https://github.com/devblaze)
 
 ## License
 
@@ -118,5 +115,3 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-- Hat tip to anyone whose code was used
-- Inspiration
