@@ -50,7 +50,7 @@
                                 <!--                                    &lt;!&ndash; Include the SeatMap component within the modal &ndash;&gt;-->
                                 <!--                                    <SeatMap @reserve="reserveSeat" />-->
                                 <!--                                </SeatMapModal>-->
-                                <button @click="cancelEvent"
+                                <button @click="editEvent"
                                         class="focus:outline-none text-white bg-blue-700 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-blue-600 w-full">
                                     Edit
                                 </button>
@@ -138,6 +138,16 @@ export default {
                 })
                 .catch(error => console.log(error))
         },
+        editEvent() {
+            axios.get(route('event.edit', this.event.id))
+                .then(response => {
+                    console.log('Status:', response.data);
+                    sendNotification({ message: 'Redirect to edit event.' }, 'success');
+                })
+                .catch(error => {
+                    sendNotification({ message: 'Redirection failed: ' + error }, 'danger');
+                })
+        },
         reserveSeat(seats) {
             // Handle the reserved seats data (e.g., send an API request to create reservations)
             // Close the modal when reservations are confirmed
@@ -167,14 +177,14 @@ export default {
             axios.delete(route('events.destroy', this.event.id))
                 .then(response => {
                     console.log('Status:', response.data.success);
-                    sendNotification({ message: 'Event deleted successfully!'}, 'success')
+                    sendNotification({ message: 'Event deleted successfully!'}, 'success');
                     setTimeout(() => {
-                        router.visit(route('events.index'))
+                        router.visit(route('events.index'));
                     }, 1000);
                 })
                 .catch(error => {
-                    console.log(error)
-                        sendNotification({ message: 'Event deleted successfully!'}, 'danger')
+                    console.log(error);
+                    sendNotification({ message: 'Event deleted successfully!'}, 'danger');
                 });
         }
     },

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Http\Requests\EventRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -67,15 +66,17 @@ class EventController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'date' => ['required', 'date'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date'],
             'location' => ['required', 'string', 'max:255'],
         ]);
 
         // Create a new event with the validated data
         Event::create([
             'name' => $request->input('name'),
-            'date' => $request->input('date'),
             'description' => $request->input('description'),
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
             'location' => $request->input('location'),
             'organizer_id' => $user->id
         ]);

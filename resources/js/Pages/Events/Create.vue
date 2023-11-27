@@ -32,7 +32,7 @@
                                     <label for="start_date"
                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start
                                         Date</label>
-                                    <input type="datetime-local" id="start_date" v-model="event.date"
+                                    <input type="datetime-local" id="start_date" v-model="event.start_date"
                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                            required>
                                 </div>
@@ -88,7 +88,6 @@ export default {
         return {
             event: {
                 name: '',
-                date: '',
                 description: '',
                 start_date: '',
                 end_date: '',
@@ -99,14 +98,17 @@ export default {
     methods: {
         createEvent() {
             axios.post(route('events.store'), this.event)
+            // axios.post('/events', this.event)
                 .then(response => {
                     console.log(response.data);
                     sendNotification({ message: 'Event created successfully!'}, 'success');
                     router.visit(route('events.index'));
                 })
                 .catch(error => {
+                    console.log(this.event);
                     console.error(error);
                     sendNotification({ message: 'There seems to be an error Event was not created.'}, 'danger');
+                    sendNotification({ message: error.response.data.message}, 'danger');
                 });
         },
         handleSeatMapUpdate(newLayout) {

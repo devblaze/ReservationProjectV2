@@ -10,7 +10,6 @@ ReservationProjectV2 is a web-based event reservation system, offering an intera
 - **Real-Time Notifications**: Notifications for actions such as event creation and deletion.
 - **Responsive Design**: Built with Tailwind CSS for a responsive, mobile-friendly user experience.
 - **Backend Integration**: Laravel backend for handling business logic, database operations, and API endpoints.
-- **Notification System**: Custom made with VueJS notification system for the user.
 
 ## Getting Started
 
