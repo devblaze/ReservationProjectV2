@@ -22,7 +22,7 @@ class EventFactory extends Factory
     {
         return [
             'organizer_id' => User::factory(),
-            'name' => $this->faker->sentence,
+            'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'start_date' => $this->faker->dateTimeBetween('+2 days', '+2 week'),
             'end_date' => $this->faker->dateTimeBetween('+1 week', '+2 week'),

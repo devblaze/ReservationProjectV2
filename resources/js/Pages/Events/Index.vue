@@ -50,7 +50,9 @@
                             </a>
                             <div class="p-5">
                                 <a :href="'/events/' + event.id">
-                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white event-name">{{ event.name }}</h5>
+                                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white event-name">
+                                        {{ event.title }}
+                                    </h5>
                                 </a>
 <!--                                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Start Date: {{ formatEventDate(event.date) }}</p>-->
 <!--                                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Start Time: {{ formatEventTime(event.date) }}</p>-->

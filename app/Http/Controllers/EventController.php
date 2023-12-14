@@ -63,22 +63,15 @@ class EventController extends Controller
             return response()->json(['message' => 'User not authenticated.'], 401);
         }
 
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date'],
-            'location' => ['required', 'string', 'max:255'],
-        ]);
-
         // Create a new event with the validated data
         Event::create([
-            'name' => $request->input('name'),
+            'organizer_id' => $user->id,
+            'title' => $request->input('title'),
             'description' => $request->input('description'),
             'start_date' => $request->input('start_date'),
             'end_date' => $request->input('end_date'),
             'location' => $request->input('location'),
-            'organizer_id' => $user->id
+            'is_canceled' => false
         ]);
 
         return response()->json(['message' => 'Event created!']);

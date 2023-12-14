@@ -36,7 +36,7 @@
                             </div>
                             <br>
                             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white event-name">{{
-                                    event.name
+                                    event.title
                                 }}</h2>
                             <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ event.date }}</p>
                             <p class="mt-4 text-gray-700 dark:text-gray-300 mb-7">{{ event.description }}</p>
@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import {usePage, router} from '@inertiajs/vue3';
+import {router} from '@inertiajs/vue3';
 import axios from 'axios';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import SeatMap from "@/Pages/Events/SeatMap.vue";
@@ -139,14 +139,16 @@ export default {
                 .catch(error => console.log(error))
         },
         editEvent() {
-            axios.get(route('event.edit', this.event.id))
-                .then(response => {
-                    console.log('Status:', response.data);
-                    sendNotification({ message: 'Redirect to edit event.' }, 'success');
-                })
-                .catch(error => {
-                    sendNotification({ message: 'Redirection failed: ' + error }, 'danger');
-                })
+            router.visit(route('events.edit', this.event.id));
+            // axios.get(route('event.edit', this.event.id))
+            //     .then(response => {
+            //         console.log('Status:', response.data);
+            //         sendNotification({ message: 'Redirect to edit event.' }, 'success');
+            //
+            //     })
+            //     .catch(error => {
+            //         sendNotification({ message: 'Redirection failed: ' + error }, 'danger');
+            //     })
         },
         reserveSeat(seats) {
             // Handle the reserved seats data (e.g., send an API request to create reservations)

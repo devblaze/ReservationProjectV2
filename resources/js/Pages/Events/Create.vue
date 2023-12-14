@@ -10,28 +10,34 @@
                                 <!-- Event title input -->
                                 <div>
                                     <label for="title"
-                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event
-                                        Title</label>
-                                    <input type="text" id="title" v-model="event.name"
+                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Event Title
+                                    </label>
+                                    <input type="text" id="title" v-model="event.title"
                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                           placeholder="Event Title" required>
+                                           placeholder="Event Title"
+                                           required>
                                 </div>
 
                                 <!-- Event description textarea -->
                                 <div>
                                     <label for="description"
-                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event
-                                        Description</label>
+                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Event Description
+                                    </label>
                                     <textarea id="description" v-model="event.description"
                                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                              placeholder="Event Description" required></textarea>
+                                              placeholder="Event Description"
+                                              required>
+                                    </textarea>
                                 </div>
 
                                 <!-- Event start date input -->
                                 <div>
                                     <label for="start_date"
-                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start
-                                        Date</label>
+                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Start Date
+                                    </label>
                                     <input type="datetime-local" id="start_date" v-model="event.start_date"
                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                            required>
@@ -40,8 +46,9 @@
                                 <!-- Event end date input -->
                                 <div>
                                     <label for="end_date"
-                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End
-                                        Date</label>
+                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        End Date
+                                    </label>
                                     <input type="datetime-local" id="end_date" v-model="event.end_date"
                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                            required>
@@ -50,10 +57,13 @@
                                 <!-- Event location input -->
                                 <div>
                                     <label for="location"
-                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Location</label>
+                                           class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Location
+                                    </label>
                                     <input type="text" id="location" v-model="event.location"
                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                           placeholder="Event Location" required>
+                                           placeholder="Event Location"
+                                           required>
                                 </div>
 
                                 <CreateSeatMap @update-layout="handleSeatMapUpdate"></CreateSeatMap>
@@ -87,7 +97,7 @@ export default {
     data() {
         return {
             event: {
-                name: '',
+                title: '',
                 description: '',
                 start_date: '',
                 end_date: '',
@@ -97,6 +107,7 @@ export default {
     },
     methods: {
         createEvent() {
+            console.log(this.event);
             axios.post(route('events.store'), this.event)
             // axios.post('/events', this.event)
                 .then(response => {

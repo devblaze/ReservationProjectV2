@@ -16,7 +16,7 @@ class Event extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
+        'title',
         'description',
         'start_date',
         'end_date',
