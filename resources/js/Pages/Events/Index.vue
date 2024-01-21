@@ -75,13 +75,18 @@
                 </div>
 
                 <!-- Pagination component -->
-                <div class="mt-4">
-                    <a :href="events.prev_page_url" class="btn btn-primary" v-if="events.prev_page_url">
-                        Previous
-                    </a>
-                    <a :href="events.next_page_url" class="btn btn-primary" v-if="events.next_page_url">
-                        Next
-                    </a>
+                <div class="container md:mb-8 pt-8 px-4 mx-auto flex justify-center select-none">
+                    <a class="block border px-4 py-2 rounded-l hover:bg-gray-200 text-gray-600" rel="prev" href="#">&larr;</a>
+
+                    <a class="block border px-4 py-2 hover:bg-gray-200 text-gray-600" href="#">1</a>
+                    <a class="block border px-4 py-2 bg-indigo-500 text-white" href="#">2</a>
+                    <a class="block border px-4 py-2 hover:bg-gray-200 text-gray-600" href="#">3</a>
+
+                    <span class="border px-4 py-2 cursor-not-allowed text-gray-400">&hellip;</span>
+
+                    <a class="block border px-4 py-2 hover:bg-gray-200 text-gray-600" href="#">10</a>
+
+                    <a class="block border px-4 py-2 rounded-r hover:bg-gray-200 text-gray-600" href="#" rel="next">&rarr;</a>
                 </div>
             </div>
         </slot>
