@@ -64,17 +64,18 @@ class EventController extends Controller
         }
 
         // Create a new event with the validated data
-        Event::create([
+        $event = Event::create([
             'organizer_id' => $user->id,
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'start_date' => $request->input('start_date'),
             'end_date' => $request->input('end_date'),
             'location' => $request->input('location'),
-            'is_canceled' => false
+            'is_canceled' => false,
+            'seat_map' => $request->input('seat_map'),
         ]);
 
-        return response()->json(['message' => 'Event created!']);
+        return response()->json(['message' => 'Event created!', 'event' => $event]);
     }
 
     /**
@@ -85,8 +86,11 @@ class EventController extends Controller
      */
     public function show(Event $event): Response
     {
+        $seatMap = $event->seat_map ? json_decode($event->seat_map, true) : [];
+
         return Inertia::render('Events/Show', [
             'event' => $event,
+            'seatMap' => $seatMap,
         ]);
     }
 

@@ -13,9 +13,9 @@
             </div>
         </div>
         <div class="flex justify-between">
-            <button class="btn bg-blue-500 hover:bg-blue-600 text-white" @click="addItem('chair')">Add Chair</button>
-            <button class="btn bg-blue-500 hover:bg-blue-600 text-white" @click="addItem('table')">Add Table</button>
-            <button class="btn bg-blue-600 hover:bg-blue-700 text-white" @click="saveLayout">Save Layout</button>
+            <button type="button" class="btn bg-blue-500 hover:bg-blue-600 text-white" @click="addItem('chair')">Add Chair</button>
+            <button type="button" class="btn bg-blue-500 hover:bg-blue-600 text-white" @click="addItem('table')">Add Table</button>
+<!--            <button type="button" class="btn bg-blue-600 hover:bg-blue-700 text-white" @click="saveLayout">Save Layout</button>-->
         </div>
     </div>
 </template>
@@ -51,6 +51,7 @@ export default {
             if (this.currentDragItem) {
                 this.currentDragItem = null;
             }
+            this.emitLayout();
         },
         addItem(type) {
             const newItem = {
@@ -60,9 +61,11 @@ export default {
                 booked: false,
                 x: 50,
                 y: 50,
-                icon: type === 'chair' ? '🪑' : '🛏️', // Emoji icons for chair and table
+                icon: type === 'chair' ? 'chairIcon' : 'tableIcon', // Emoji icons for chair and table
+                // icon: type === 'chair' ? '🪑' : '🛏️', // Emoji icons for chair and table
             };
             this.items.push(newItem);
+            this.emitLayout();
         },
         generateUniqueId() {
             return Date.now() + Math.random().toString(36).substr(2, 9);
@@ -71,7 +74,7 @@ export default {
             // Here you would send the layout to your backend to be saved
             // Replace with an actual API call to your Laravel backend
             console.log('Layout saved!');
-            axios.post('/save-layout', {layout: this.layout})
+            axios.post('/save-layout', {layout: this.items})
                 .then(response => {
                     // Handle success
                     console.log('Layout saved', response);
@@ -82,7 +85,7 @@ export default {
                 });
         },
         emitLayout() {
-            this.$emit('update-layout', this.layout);
+            this.$emit('update-layout', this.items);
         }
     },
 };

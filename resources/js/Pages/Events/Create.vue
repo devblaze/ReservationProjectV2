@@ -102,28 +102,38 @@ export default {
                 start_date: '',
                 end_date: '',
                 location: '',
+                seat_map: '',
             },
         };
     },
     methods: {
         createEvent() {
-            console.log(this.event);
-            axios.post(route('events.store'), this.event)
-            // axios.post('/events', this.event)
+            // Convert seat_map to a JSON string before sending it to the server
+            const eventData = {
+                ...this.event,
+                seat_map: JSON.stringify(this.event.seat_map),
+            };
+
+            console.log(eventData);
+
+            axios.post(route('events.store'), eventData)
                 .then(response => {
                     console.log(response.data);
                     sendNotification({ message: 'Event created successfully!'}, 'success');
                     router.visit(route('events.index'));
                 })
                 .catch(error => {
-                    console.log(this.event);
+                    console.log(eventData);
                     console.error(error);
-                    sendNotification({ message: 'There seems to be an error Event was not created.'}, 'danger');
-                    sendNotification({ message: error.response.data.message}, 'danger');
+                    sendNotification({ message: 'There seems to be an error. Event was not created.'}, 'danger');
+                    if (error.response && error.response.data && error.response.data.message) {
+                        sendNotification({ message: error.response.data.message}, 'danger');
+                    }
                 });
         },
-        handleSeatMapUpdate(newLayout) {
-            this.event.seatMapLayout = newLayout;
+        handleSeatMapUpdate(seatMap) {
+            // console.log('Updating seat map with:', JSON.parse(JSON.stringify(seatMap)));// Debugging line
+            this.event.seat_map = JSON.parse(JSON.stringify(seatMap));
         },
     },
 };

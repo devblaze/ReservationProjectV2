@@ -23,6 +23,7 @@ class Event extends Model
         'location',
         'is_canceled',
         'organizer_id',
+        'seat_map',
     ];
 
     /**

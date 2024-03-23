@@ -20,6 +20,7 @@ return new class extends Migration
             $table->dateTime('end_date');
             $table->string('location');
             $table->boolean('is_canceled')->default(false);
+            $table->json('seat_map')->nullable();
             $table->timestamps();
         });
     }
