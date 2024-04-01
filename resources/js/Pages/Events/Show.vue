@@ -40,53 +40,81 @@
                                 }}</h2>
                             <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ event.date }}</p>
                             <p class="mt-4 text-gray-700 dark:text-gray-300 mb-7">{{ event.description }}</p>
-
-                            <div class="flex flex-row justify-between mx-1">
-                                <button @click="showSeatMapModal"
-                                        class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 w-full">
-                                    Reserve Seat
-                                </button>
-                                <!--                                <SeatMapModal v-if="isSeatMapVisible" @close="closeSeatMapModal">-->
-                                <!--                                    &lt;!&ndash; Include the SeatMap component within the modal &ndash;&gt;-->
-                                <!--                                    <SeatMap @reserve="reserveSeat" />-->
-                                <!--                                </SeatMapModal>-->
-                                <button @click="editEvent"
-                                        class="focus:outline-none text-white bg-blue-700 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-blue-600 w-full">
-                                    Edit
-                                </button>
-                                <button @click="cancelEvent"
-                                        class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-900 w-full">
-                                    Cancel
-                                </button>
-                            </div>
-                            <div>
-                                <button @click="openDeleteModal"
-                                        class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900 w-full delete-event-button">
-                                    Delete
-                                </button>
-                            </div>
-
-                            <EventDeletionPopup v-if="showModal" type="danger" title="Confirm Action" width="sm"
-                                                v-on:close="closeDeleteModal()">
-                                <p class="text-gray-800">
-                                    Are you sure you want you delete your event? This action cannot be undone.
-                                </p>
-
-                                <div class="text-right mt-4">
-                                    <button @click="closeDeleteModal()"
-                                            class="px-4 py-2 text-sm text-gray-600 focus:outline-none hover:underline">
-                                        Cancel
+                            <ReserveSeatMap :initialItems="event.seat_map"
+                                           @select-seat="requestedSeats()">
+                            </ReserveSeatMap>
+                            <div class="grid grid-cols-2 grid-row-3 gap-1">
+                                <div class="col-span-2">
+                                    <button class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 w-full">
+                                        Reserve Seat
                                     </button>
-                                    <button
-                                        type="button"
-                                        @click="deleteEvent"
-                                        :class="{ 'cursor-not-allowed opacity-50': deleteButtonDisabled }"
-                                        class="mr-2 px-4 py-2 text-sm rounded text-white bg-red-500 focus:outline-none hover:bg-red-400 delete-event-confirm"
-                                        :disabled="deleteButtonDisabled">
-                                        Delete {{ countdown < countdownReset ? `(${countdown})` : '' }}
+<!--                                    <button @click="isSeatMapVisible = true"-->
+<!--                                            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 w-full">-->
+<!--                                        Reserve Seat-->
+<!--                                    </button>-->
+<!--                                    <SeatMap v-if="isSeatMapVisible" type="danger" title="Confirm Action" width="sm"-->
+<!--                                             v-on:close="isSeatMapVisible = false">-->
+<!--                                        <p class="text-gray-800">-->
+<!--                                            Are you sure you want you delete your event? This action cannot be-->
+<!--                                            undone.-->
+<!--                                        </p>-->
+
+<!--                                        <div class="text-right mt-4">-->
+<!--                                            <button @click="isSeatMapVisible = false"-->
+<!--                                                    class="px-4 py-2 text-sm text-gray-600 focus:outline-none hover:underline">-->
+<!--                                                Cancel-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                    </SeatMap>-->
+                                </div>
+                                <div>
+                                    <button @click="editEvent"
+                                            class="focus:outline-none text-white bg-blue-700 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-blue-600 w-full">
+                                        Edit
                                     </button>
                                 </div>
-                            </EventDeletionPopup>
+                                <div>
+                                    <button @click="cancelEvent"
+                                            class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-900 w-full">
+                                        Cancel
+                                    </button>
+                                </div>
+                                <div class="col-span-2">
+                                    <button @click="openDeleteModal"
+                                            class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900 w-full delete-event-button">
+                                        Delete
+                                    </button>
+
+                                    <DangerousActionConfirmation
+                                        v-if="showModal"
+                                        type="danger"
+                                        title="Event Deletion Confirmation"
+                                        width="sm"
+                                        v-on:close="closeDeleteModal()"
+                                        class="flex flex-row justify-between mx-2"
+                                    >
+                                        <p class="text-gray-800">
+                                            Are you sure you want you delete your event? This action cannot be
+                                            undone.
+                                        </p>
+
+                                        <div class="text-right mt-4">
+                                            <button @click="closeDeleteModal()"
+                                                    class="px-4 py-2 text-sm text-gray-600 focus:outline-none hover:underline">
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="button"
+                                                @click="deleteEvent"
+                                                :class="{ 'cursor-not-allowed opacity-50': deleteButtonDisabled }"
+                                                class="mr-2 px-4 py-2 text-sm rounded text-white bg-red-500 focus:outline-none hover:bg-red-400 delete-event-confirm"
+                                                :disabled="deleteButtonDisabled">
+                                                Delete {{ countdown < countdownReset ? `(${countdown})` : '' }}
+                                            </button>
+                                        </div>
+                                    </DangerousActionConfirmation>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -99,20 +127,21 @@
 import {router} from '@inertiajs/vue3';
 import axios from 'axios';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import SeatMap from "@/Pages/Events/SeatMap.vue";
-import EventDeletionPopup from "@/Components/DangerousActionConfirmation.vue";
+import ReserveSeatMap from "@/Components/ReserveSeatMap.vue";
+import CreateSeatMap from "@/Components/CreateSeatMap.vue";
+import DangerousActionConfirmation from "@/Components/DangerousActionConfirmation.vue";
 import {sendNotification} from "@/Components/notificationService";
 
 export default {
     components: {
-        SeatMap,
+        ReserveSeatMap,
         AuthenticatedLayout,
-        EventDeletionPopup
+        DangerousActionConfirmation,
+        CreateSeatMap,
     },
     data() {
         return {
             hasReservedSeat: false,
-            isSeatMapVisible: false,
             showModal: false,
             deleteButtonDisabled: true,
             countdown: 1,
@@ -123,12 +152,6 @@ export default {
         event: Object,
     },
     methods: {
-        showSeatMapModal() {
-            this.isSeatMapVisible = true;
-        },
-        closeSeatMapModal() {
-            this.isSeatMapVisible = false;
-        },
         cancelEvent() {
             axios.put(route('events.update', this.event.id), {is_canceled: true})
                 .then(response => {
@@ -175,18 +198,22 @@ export default {
                 }
             }, 1000)
         },
+        requestedSeats(selectedSeats) {
+            // console.log('Updating seat map with:', JSON.parse(JSON.stringify(seatMap)));// Debugging line
+            this.event.seat_map = JSON.parse(JSON.stringify(selectedSeats));
+        },
         async deleteEvent() {
             axios.delete(route('events.destroy', this.event.id))
                 .then(response => {
                     console.log('Status:', response.data.success);
-                    sendNotification({ message: 'Event deleted successfully!'}, 'success');
+                    sendNotification({message: 'Event deleted successfully!'}, 'success');
                     setTimeout(() => {
                         router.visit(route('events.index'));
                     }, 1000);
                 })
                 .catch(error => {
                     console.log(error);
-                    sendNotification({ message: 'Event deleted successfully!'}, 'danger');
+                    sendNotification({message: 'Event deleted successfully!'}, 'danger');
                 });
         }
     },
