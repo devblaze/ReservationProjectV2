@@ -15,7 +15,6 @@
         <div class="flex justify-between">
             <button type="button" class="btn bg-blue-500 hover:bg-blue-600 text-white" @click="addItem('chair')">Add Chair</button>
             <button type="button" class="btn bg-blue-500 hover:bg-blue-600 text-white" @click="addItem('table')">Add Table</button>
-<!--            <button type="button" class="btn bg-blue-600 hover:bg-blue-700 text-white" @click="saveLayout">Save Layout</button>-->
         </div>
     </div>
 </template>
@@ -24,11 +23,15 @@
 import axios from "axios";
 
 export default {
+    props: {
+        initialItems: {
+            type: Array,
+            default: () => [],
+        },
+    },
     data() {
         return {
             items: [],
-            layout: Array.from({length: 100}, () => []), // 10 rows for example
-            rows: 100, // Number of rows in the map
             currentDragItem: null,
             offsetX: 0,
             offsetY: 0,
@@ -61,8 +64,6 @@ export default {
                 booked: false,
                 x: 50,
                 y: 50,
-                icon: type === 'chair' ? 'chairIcon' : 'tableIcon', // Emoji icons for chair and table
-                // icon: type === 'chair' ? '🪑' : '🛏️', // Emoji icons for chair and table
             };
             this.items.push(newItem);
             this.emitLayout();
@@ -70,23 +71,12 @@ export default {
         generateUniqueId() {
             return Date.now() + Math.random().toString(36).substr(2, 9);
         },
-        saveLayout() {
-            // Here you would send the layout to your backend to be saved
-            // Replace with an actual API call to your Laravel backend
-            console.log('Layout saved!');
-            axios.post('/save-layout', {layout: this.items})
-                .then(response => {
-                    // Handle success
-                    console.log('Layout saved', response);
-                })
-                .catch(error => {
-                    // Handle error
-                    console.error('Error saving layout', error);
-                });
-        },
         emitLayout() {
             this.$emit('update-layout', this.items);
-        }
+        },
+    },
+    created() {
+        this.items = this.initialItems.map(item => ({ ...item }));
     },
 };
 </script>
@@ -95,7 +85,7 @@ export default {
 .btn {
     padding: 0.5rem 1.5rem;
     border: none;
-    border-radius: 0.375rem; /* rounded-md */
+    border-radius: 0.375rem;
     cursor: pointer;
     transition: background-color 150ms ease-in-out;
 }
@@ -111,12 +101,6 @@ export default {
 
 .chair {
     background-color: #3f3f46;
-    /*
-    background-image: url('https://png.pngtree.com/png-vector/20190411/ourmid/pngtree-vector-chair-icon-png-image_927127.jpg')
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    */
 }
 
 .table {

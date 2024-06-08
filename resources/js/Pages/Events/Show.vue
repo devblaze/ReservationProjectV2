@@ -10,7 +10,9 @@
                         <strong class="font-bold">Holy smokes!</strong><br>
                         <span class="block sm:inline">Something seriously bad happened.</span>
                         <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path
+    <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+        <title>Close</title>
+        <path
         d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
   </span>
                     </div>
@@ -41,42 +43,19 @@
                             <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ event.date }}</p>
                             <p class="mt-4 text-gray-700 dark:text-gray-300 mb-7">{{ event.description }}</p>
                             <ReserveSeatMap :initialItems="event.seat_map"
-                                           @select-seat="requestedSeats()">
+                                           @selected-seats="selectedSeats">
                             </ReserveSeatMap>
                             <div class="grid grid-cols-2 grid-row-3 gap-1">
                                 <div class="col-span-2">
-                                    <button class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 w-full">
+                                    <button @click="reserveSeats"
+                                        class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 w-full">
                                         Reserve Seat
                                     </button>
-<!--                                    <button @click="isSeatMapVisible = true"-->
-<!--                                            class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 w-full">-->
-<!--                                        Reserve Seat-->
-<!--                                    </button>-->
-<!--                                    <SeatMap v-if="isSeatMapVisible" type="danger" title="Confirm Action" width="sm"-->
-<!--                                             v-on:close="isSeatMapVisible = false">-->
-<!--                                        <p class="text-gray-800">-->
-<!--                                            Are you sure you want you delete your event? This action cannot be-->
-<!--                                            undone.-->
-<!--                                        </p>-->
-
-<!--                                        <div class="text-right mt-4">-->
-<!--                                            <button @click="isSeatMapVisible = false"-->
-<!--                                                    class="px-4 py-2 text-sm text-gray-600 focus:outline-none hover:underline">-->
-<!--                                                Cancel-->
-<!--                                            </button>-->
-<!--                                        </div>-->
-<!--                                    </SeatMap>-->
                                 </div>
                                 <div>
-                                    <button @click="editEvent"
+                                    <button @click="editEvent" id="edit-event-button"
                                             class="focus:outline-none text-white bg-blue-700 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-blue-600 w-full">
                                         Edit
-                                    </button>
-                                </div>
-                                <div>
-                                    <button @click="cancelEvent"
-                                            class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-900 w-full">
-                                        Cancel
                                     </button>
                                 </div>
                                 <div class="col-span-2">
@@ -145,38 +124,40 @@ export default {
             showModal: false,
             deleteButtonDisabled: true,
             countdown: 1,
-            countdownReset: 2
+            countdownReset: 2,
+            requestedSeatsToReserve: []
         };
     },
     props: {
         event: Object,
     },
     methods: {
-        cancelEvent() {
-            axios.put(route('events.update', this.event.id), {is_canceled: true})
+        reserveSeats() {
+            const storeRequestData = {
+                "event_id": this.event.id,
+                "selectedSeats": this.requestedSeatsToReserve
+            }
+            console.log(storeRequestData);
+            axios.post(route('reservations.store', this.event.id), storeRequestData, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                }
+            })
                 .then(response => {
-                    console.log('Event canceled:', response.data.success);
-
-                    this.event.is_canceled = true;
+                    console.log(response)
                 })
                 .catch(error => console.log(error))
         },
         editEvent() {
-            router.visit(route('events.edit', this.event.id));
-            // axios.get(route('event.edit', this.event.id))
-            //     .then(response => {
-            //         console.log('Status:', response.data);
-            //         sendNotification({ message: 'Redirect to edit event.' }, 'success');
-            //
-            //     })
-            //     .catch(error => {
-            //         sendNotification({ message: 'Redirection failed: ' + error }, 'danger');
-            //     })
-        },
-        reserveSeat(seats) {
-            // Handle the reserved seats data (e.g., send an API request to create reservations)
-            // Close the modal when reservations are confirmed
-            $('#seatMapModal').modal('hide');
+            console.log("Navigating to edit page for event id:", this.event.id);
+            router.get(route('events.edit', this.event.id), {
+                onSuccess: (page) => {
+                    console.log('Navigation successful', page);
+                },
+                onError: (errors) => {
+                    console.error('Navigation failed', errors);
+                }
+            });
         },
         openDeleteModal() {
             this.showModal = true;
@@ -198,9 +179,10 @@ export default {
                 }
             }, 1000)
         },
-        requestedSeats(selectedSeats) {
+        selectedSeats(seats) {
             // console.log('Updating seat map with:', JSON.parse(JSON.stringify(seatMap)));// Debugging line
-            this.event.seat_map = JSON.parse(JSON.stringify(selectedSeats));
+            console.log(JSON.stringify(seats))
+            this.requestedSeatsToReserve = JSON.parse(JSON.stringify(seats));
         },
         async deleteEvent() {
             axios.delete(route('events.destroy', this.event.id))
@@ -217,32 +199,5 @@ export default {
                 });
         }
     },
-
-    // setup() {
-    //     const {event} = usePage();
-    //
-    //     // Function to reserve a seat for the event
-    //     const reserveSeat = async () => {
-    //         try {
-    //             // Make an HTTP POST request to create a reservation
-    //             const response = await axios.post(route('reservations.store', { event: event.id }));
-    //
-    //             // Handle the response and update the isReserved flag
-    //             if (response.status === 200) {
-    //                 this.hasReservedSeat = true;
-    //             } else {
-    //                 // Handle errors or display a message
-    //                 console.error('Reservation failed.');
-    //             }
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //     };
-    //
-    //     // Check if the user has already reserved a seat when the component is mounted
-    //     onMounted(() => {
-    //         this.hasReservedSeat = false;
-    //     });
-    // },
 };
 </script>

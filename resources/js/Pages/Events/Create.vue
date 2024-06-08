@@ -66,7 +66,7 @@
                                            required>
                                 </div>
 
-                                <CreateSeatMap @update-layout="handleSeatMapUpdate"></CreateSeatMap>
+                                <CreateSeatMap @update-layout="updateSeatMap"></CreateSeatMap>
 
                                 <!-- Submit button -->
                                 <button type="submit"
@@ -131,7 +131,7 @@ export default {
                     }
                 });
         },
-        handleSeatMapUpdate(seatMap) {
+        updateSeatMap(seatMap) {
             // console.log('Updating seat map with:', JSON.parse(JSON.stringify(seatMap)));// Debugging line
             this.event.seat_map = JSON.parse(JSON.stringify(seatMap));
         },

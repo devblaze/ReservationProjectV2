@@ -70,11 +70,11 @@ export default {
         selectItem(item) {
             item.selected = true;
             this.selectedItems.push(item);
-            this.emitLayout();
+            this.emitSelectedSeats();
         },
-    },
-    emitLayout() {
-        this.$emit('requested-seats', this.selectedItems);
+        emitSelectedSeats() {
+            this.$emit('selected-seats', this.selectedItems);
+        },
     },
     created() {
         this.layout = JSON.parse(this.initialItems);
