@@ -110,6 +110,7 @@ export default {
             this.form.seat_map = JSON.stringify(seats);
         },
         updateEvent() {
+            console.log(this.event);
             axios.put(`/events/${this.event.id}`, this.form)
                 .then(response => {
                     sendNotification({message: 'Event updated successfully!'}, 'success');
