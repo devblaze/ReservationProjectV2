@@ -80,6 +80,7 @@ These instructions will guide you through setting up the project on your local m
 To start the application, use the following command:
 ```bash
 sail -up -d
+sail npm run dev
 ```
 The application will be accessible at `http://localhost`.
 
