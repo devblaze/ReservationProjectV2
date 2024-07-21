@@ -14,6 +14,10 @@ steps:
       - cp .env.example .env
       - composer install
       - php artisan key:generate
+
+  - name: start_services
+    image: laravelsail/php80-composer:latest
+    commands:
       - ./vendor/bin/sail up -d
       - sleep 20
 
@@ -28,6 +32,7 @@ steps:
       DB_PASSWORD: your_password
     commands:
       - ./vendor/bin/sail artisan migrate --force
+      - ./vendor/bin/sail artisan scout:import
 
   - name: run_tests
     image: laravelsail/php80-composer:latest
@@ -39,7 +44,7 @@ steps:
       DB_USERNAME: your_username
       DB_PASSWORD: your_password
     commands:
-      - ./vendor/bin/sail test
+      - ./vendor/bin/sail artisan test
 
 services:
   mysql:
@@ -50,12 +55,19 @@ services:
       MYSQL_USER: your_username
       MYSQL_PASSWORD: your_password
     ports:
-      - 3306:3306
+      - 3306
 
   redis:
     image: redis:latest
     ports:
-      - 6379:6379
+      - 6379
+
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    ports:
+      - 7700
+    environment:
+      MEILI_NO_ANALYTICS: "true"
 
 volumes:
   - name: vendor
@@ -66,5 +78,5 @@ trigger:
     - push
     - pull_request
   branch:
-    - master
     - drone-pipeline
+    - master
