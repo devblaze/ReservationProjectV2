@@ -1,82 +1,80 @@
 kind: pipeline
 type: docker
-name: default
+name: laravel-sail
 
 steps:
   - name: setup
-    image: busybox
-    commands:
-      - echo "Setting up the environment"
-
-  - name: install_dependencies
-    image: composer:latest
+    image: laravelsail/php80-composer
+    environment:
+      APP_ENV: testing
     commands:
       - cp .env.example .env
       - composer install
       - php artisan key:generate
 
-  - name: start_services
-    image: laravelsail/php80-composer:latest
+  - name: install-npm
+    image: node:14
+    commands:
+      - npm install
+
+  - name: run-migrations
+    image: laravelsail/php80-composer
+    environment:
+      APP_ENV: testing
     commands:
       - ./vendor/bin/sail up -d
-      - sleep 20
+      - ./vendor/bin/sail artisan migrate --seed
 
-  - name: run_migrations
-    image: laravelsail/php80-composer:latest
+  - name: run-tests
+    image: laravelsail/php80-composer
     environment:
-      DB_CONNECTION: mysql
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_DATABASE: your_database
-      DB_USERNAME: your_username
-      DB_PASSWORD: your_password
+      APP_ENV: testing
     commands:
-      - ./vendor/bin/sail artisan migrate --force
+      - ./vendor/bin/sail up -d
       - ./vendor/bin/sail artisan scout:import
-
-  - name: run_tests
-    image: laravelsail/php80-composer:latest
-    environment:
-      DB_CONNECTION: mysql
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_DATABASE: your_database
-      DB_USERNAME: your_username
-      DB_PASSWORD: your_password
-    commands:
       - ./vendor/bin/sail artisan test
+
+  - name: build-assets
+    image: laravelsail/php80-composer
+    commands:
+      - ./vendor/bin/sail up -d
+      - ./vendor/bin/sail npm install
+      - ./vendor/bin/sail npm run production
+
+  - name: start-application
+    image: laravelsail/php80-composer
+    commands:
+      - ./vendor/bin/sail up -d
+      - ./vendor/bin/sail npm run dev &
+
+  - name: run-cypress-tests
+    image: cypress/included:9.1.1
+    commands:
+      - npm install
+      - ./node_modules/.bin/cypress run
 
 services:
   mysql:
-    image: mysql:latest
+    image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: your_database
-      MYSQL_USER: your_username
-      MYSQL_PASSWORD: your_password
-    ports:
-      - 3306
-
-  redis:
-    image: redis:latest
-    ports:
-      - 6379
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: sail
+      MYSQL_PASSWORD: password
 
   meilisearch:
     image: getmeili/meilisearch:latest
     ports:
-      - 7700
-    environment:
-      MEILI_NO_ANALYTICS: "true"
+      - 7700:7700
 
 volumes:
-  - name: vendor
+  - name: cache
     temp: {}
 
 trigger:
+  branch:
+    - master
+    - develop
   event:
     - push
     - pull_request
-  branch:
-    - drone-pipeline
-    - master
