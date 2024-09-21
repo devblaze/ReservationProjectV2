@@ -7,16 +7,26 @@ use App\Models\Reservation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class ReservationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $reservations = Reservation::where('user_id', Auth::id())->get();
-        return response()->json($reservations);
+
+        // Check if it's an API request, and return JSON data if so
+        if ($request->wantsJson()) {
+            return response()->json($reservations);
+        }
+
+        // Otherwise, render the Inertia.js page
+        return Inertia::render('Reservations/Index', [
+            'reservations' => $reservations
+        ]);
     }
 
     /**

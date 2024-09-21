@@ -6,7 +6,7 @@
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6 text-gray-900 dark:text-gray-100">
                             <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Edit Event</h2>
-                            <form @submit.prevent="updateEvent">
+                            <form @submit.prevent="submitUpdate">
                                 <div class="mb-4">
                                     <label for="title"
                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
@@ -109,8 +109,7 @@ export default {
         updateSeatMap(seats) {
             this.form.seat_map = JSON.stringify(seats);
         },
-        updateEvent() {
-            console.log(this.event);
+        submitUpdate() {
             axios.put(`/events/${this.event.id}`, this.form)
                 .then(response => {
                     sendNotification({message: 'Event updated successfully!'}, 'success');

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->string('uid');             // Unique seat identifier (id) within the event.
             $table->string('label');           // Seat label (e.g., 'Table', 'Chair')
             $table->string('type');            // Seat type (table, chair, etc.)
-            $table->string('icon');            // Icon associated with the seat type (optional)
             $table->boolean('booked')->default(false); // Whether the seat is booked or not
             $table->integer('x');              // X coordinate
             $table->integer('y');              // Y coordinate
