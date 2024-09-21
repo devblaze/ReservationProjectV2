@@ -17,7 +17,7 @@ jobs:
         image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: sail_db
+          MYSQL_DATABASE: reservationprojectv2
           MYSQL_USER: sail
           MYSQL_PASSWORD: password
         ports:
@@ -45,43 +45,31 @@ jobs:
         with:
           node-version: '16.x'
 
-      - name: Set up Docker environment
+      - name: Setup environment and application key
         run: |
-          docker run --rm \
-            -u "$(id -u):$(id -g)" \
-            -v $(pwd):/var/www/html \
-            -w /var/www/html \
-            laravelsail/php81-composer:latest \
-            composer install --ignore-platform-reqs
+          cp .env.example .env             # Set the environment variable file
+          php artisan key:generate      # Generate application key
 
-      - name: Setup Sail and Start Services
+      - name: Setup Docker Compose and Start Services
         run: |
-          alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
-          sail up -d   # Start docker containers
+          docker compose up -d   # Start docker containers
 
       - name: Install NPM dependencies
         run: |
           npm install
           npm run dev   # Build the frontend assets
 
-      - name: Setup environment and application key
-        run: |
-          cp .env.example .env             # Set the environment variable file
-          sail artisan key:generate         # Generate application key
-          echo "SCOUT_DRIVER=meilisearch" >> .env
-          echo "MEILISEARCH_HOST=http://meilisearch:7700/" >> .env
-
       - name: Run database migrations and seeders
         run: |
-          sail artisan migrate --seed
+          php artisan migrate --seed
 
       - name: Index the Models with Laravel Scout
         run: |
-          sail artisan scout:import "App\\Models\\Event"
+          php artisan scout:import "App\\Models\\Event"
 
       - name: Run Test Suite (PHPUnit/Dusk)
         run: |
-          sail artisan test
+          php artisan test
 
       - name: Lint and Fix CSS Files
         run: |
@@ -89,4 +77,4 @@ jobs:
 
       - name: Stop and Cleanup Services
         run: |
-          sail down  # Stop Docker containers
+          docker compose down  # Stop Docker containers
