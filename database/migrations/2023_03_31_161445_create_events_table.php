@@ -9,9 +9,9 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('events', function (Blueprint $table) {
+        Schema::create('events', static function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('organizer_id');
             $table->string('title');
@@ -20,7 +20,6 @@ return new class extends Migration
             $table->dateTime('end_date');
             $table->string('location');
             $table->boolean('is_canceled')->default(false);
-            $table->json('seat_map')->nullable();
             $table->timestamps();
         });
     }

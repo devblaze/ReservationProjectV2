@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Event;
+use App\Models\Seat;
 use Illuminate\Database\Seeder;
 
 class EventSeeder extends Seeder
@@ -12,6 +13,10 @@ class EventSeeder extends Seeder
      */
     public function run(): void
     {
-        Event::factory()->count(100)->create();
+        // Seed an event and attach seats to it
+        Event::factory()
+            ->count(10)  // Generate 10 events
+            ->has(Seat::factory()->count(30))  // For each event, generate 30 seats
+            ->create();
     }
 }

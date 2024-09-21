@@ -56,19 +56,19 @@ These instructions will guide you through setting up the project on your local m
       Set up your environment variables in .env file (use .env.example as a template).
       Generate an application key:
       ```bash
-      php artisan key:generate
+      sail artisan key:generate
       ```
       Run migrations and seed the database (if applicable):
       ```bash
-      php artisan migrate --seed
+      sail artisan migrate --seed
       ```
     - Start the frontend server:
       ```bash
       npm run dev # In a separate terminal
       ```
     - Import the event model to Laravel Scout:
-      ```
-      php artisan scout:import
+      ```bash
+      sail artisan scout:import
       ```
 
 3. **Environment Configuration**:
@@ -77,6 +77,18 @@ These instructions will guide you through setting up the project on your local m
       SCOUT_DRIVER=meilisearch
       MEILISEARCH_HOST=http://<meilisearch-container-name>:7700/
       ```
+### Dummy data
+You can generate or reset your database and fill it with dummy data with the following command:
+```bash
+sail artisan migrate:fresh --seed
+```
+
+You also need to update your scout in order to have your data in the meilisearch.
+```bash
+sail artisan scout:flush "App\Models\<YourModel>"
+~ All [App\Models\Event] records have been flushed.
+sail artisan scout:import "App\Models\<YourModel>"
+```
 
 ## Running the Application
 

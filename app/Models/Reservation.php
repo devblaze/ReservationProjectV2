@@ -8,4 +8,43 @@ use Illuminate\Database\Eloquent\Model;
 class Reservation extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'event_id',
+        'seat_id',
+        'price',
+        'status'
+    ];
+
+    protected $casts = [
+        'seat_numbers' => 'array',  // Cast seat_numbers to array type
+    ];
+
+    /**
+     * The reservations must belong to an event.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    /**
+     * The reservation must belong to a user.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The reservation can have many reserved seats.
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function seats()
+    {
+        return $this->hasMany(Seat::class);
+    }
 }

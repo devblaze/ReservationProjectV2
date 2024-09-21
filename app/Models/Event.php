@@ -35,10 +35,18 @@ class Event extends Model
     }
 
     /**
-     * Get the reservations for the event.
+     * An event can have many reservations.
      */
     public function reservations()
     {
         return $this->hasMany(Reservation::class);
+    }
+
+    /**
+     * Event has many seats.
+     */
+    public function seats()
+    {
+        return $this->hasMany(Seat::class);
     }
 }

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\Reservation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
@@ -12,15 +15,54 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        //
+        $reservations = Reservation::where('user_id', Auth::id())->get();
+        return response()->json($reservations);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): void
+    public function store(Request $request): JsonResponse
     {
-        dd($request);
+        $event = Event::find($request->event_id);
+        if (!$event) {
+            return response()->json(['error' => 'Event not found'], 404);
+        }
+
+        // Validate incoming data
+        $validated = $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'selectedSeats' => 'required|array|min:1'  // Ensure 'selectedSeats' is an array of at least 1 seat
+        ]);
+
+        $eventId = $validated['event_id'];
+        $selectedSeats = $validated['selectedSeats'];
+
+        // Check if any of the selected seats are already reserved
+        $reservedSeats = Reservation::where('event_id', $eventId)
+            ->whereIn('seat_numbers', $selectedSeats)  // You can adjust this if structure differs
+            ->pluck('seat_numbers')
+            ->toArray();
+
+        if (!empty($reservedSeats)) {
+            return response()->json([
+                'error' => 'Some seats already reserved',
+                'reservedSeats' => $reservedSeats
+            ], 400);
+        }
+
+        // Reserve the selected seats
+        $reservation = Reservation::create([
+            'user_id' => Auth::id(),
+            'event_id' => $eventId,
+            'seat_numbers' => $selectedSeats,
+            'status' => 'confirmed'  // Default to confirmed
+        ]);
+
+        return response()->json([
+            'message' => 'Seats have been reserved successfully',
+            'reservation' => $reservation
+        ], 201);
     }
 
     /**
