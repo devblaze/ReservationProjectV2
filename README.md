@@ -1,6 +1,4 @@
-> [!NOTE]
-> Build status [![Build Status](http://192.168.4.202/api/badges/nickanton/ReservationProjectV2/status.svg)](http://192.168.4.202/nickanton/ReservationProjectV2)
-
+[![CI for Laravel Sail Application](https://github.com/devblaze/ReservationProjectV2/actions/workflows/laravel.yml/badge.svg?branch=master)](https://github.com/devblaze/ReservationProjectV2/actions/workflows/laravel.yml)
 # ReservationProjectV2
 
 ReservationProjectV2 is a web-based event reservation system, offering an interactive interface for creating, managing, and searching for events. The application uses a modern technology stack including Docker, Laravel, Vue.js, and Tailwind CSS, and leverages MeiliSearch for efficient event data handling.
