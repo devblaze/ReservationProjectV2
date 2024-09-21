@@ -86,14 +86,13 @@ class EventController extends Controller
      */
     public function show(Event $event): Response
     {
-        $seatMap = $event->seat_map ? json_decode($event->seat_map, true) : [];
+        $event->seat_map = $event->generateSeatMap();
         $user = Auth::user();
 
         $canEdit = $user ? $user->can('update', $event) : false;
 
         return Inertia::render('Events/Show', [
             'event' => $event,
-            'seatMap' => $seatMap,
             'canEdit' => $canEdit,
         ]);
     }

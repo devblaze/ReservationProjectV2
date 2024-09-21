@@ -23,7 +23,6 @@ class Event extends Model
         'location',
         'is_canceled',
         'organizer_id',
-        'seat_map',
     ];
 
     /**
@@ -48,5 +47,26 @@ class Event extends Model
     public function seats()
     {
         return $this->hasMany(Seat::class);
+    }
+
+    public function generateSeatMap()
+    {
+        if ($this->seats->isEmpty()){
+            return [];
+        }
+
+        $seat_map = $this->seats->map(function ($seat) {
+            return [
+                'id' => $seat->uid,       // Unique ID
+                'label' => $seat->label, // Label like "Table", "Chair", etc.
+                'type' => $seat->type,   // Type of seat ("chair", "table", etc.)
+                'icon' => $seat->icon,   // Icon associated with this seat
+                'booked' => (bool) $seat->booked,  // True if booked, false otherwise
+                'x' => $seat->x,         // X coordinate on seat map
+                'y' => $seat->y,         // Y coordinate on seat map
+            ];
+        });
+
+        return json_encode($seat_map);
     }
 }

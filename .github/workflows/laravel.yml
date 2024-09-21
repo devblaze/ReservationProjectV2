@@ -1,35 +1,92 @@
-name: Laravel Sail Build and Test
+name: CI for Laravel Sail Application
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest     # Use the latest version of Ubuntu for the build
+
+    services:
+      mysql:                    # A MySQL service required for Laravel Sail
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: sail_db
+          MYSQL_USER: sail
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout the codebase
+        uses: actions/checkout@v3
 
-      - name: Setup Laravel Sail
+      - name: Set up PHP 8.1                    # Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: mbstring, bcmath, pdo_mysql, simplexml
+          ini-values: post_max_size=256M, max_input_vars=5000
+          coverage: none
+
+      - name: Set up Node.js 16.x                # Setup Node.js for npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Set up Docker environment
         run: |
-          curl -fsSL https://laravel.sail.dev/~install.php | sh
-          sail up --scale=app=1
+          docker run --rm \
+            -u "$(id -u):$(id -g)" \
+            -v $(pwd):/var/www/html \
+            -w /var/www/html \
+            laravelsail/php81-composer:latest \
+            composer install --ignore-platform-reqs
 
-      - name: Run tests (Laravel and Cypress)
-        env:
-          CYPRESS_BASE_URL: "http://localhost"
+      - name: Setup Sail and Start Services
+        run: |
+          alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
+          sail up -d   # Start docker containers
+
+      - name: Install NPM dependencies
         run: |
           npm install
-          npm test
+          npm run dev   # Build the frontend assets
 
-      - name: Run Cypress end-to-end tests
-        env:
-          CYPRESS_BASE_URL: "http://localhost"
+      - name: Setup environment and application key
         run: |
-          cypress run --headless --browser firefox --spec 'path/to/your/cypress/end-to-end/specs/**/*.js'
+          cp .env.example .env             # Set the environment variable file
+          sail artisan key:generate         # Generate application key
+          echo "SCOUT_DRIVER=meilisearch" >> .env
+          echo "MEILISEARCH_HOST=http://meilisearch:7700/" >> .env
 
-      - name: Tear down Laravel Sail environment
-        run: sail down
+      - name: Run database migrations and seeders
+        run: |
+          sail artisan migrate --seed
+
+      - name: Index the Models with Laravel Scout
+        run: |
+          sail artisan scout:import "App\\Models\\Event"
+
+      - name: Run Test Suite (PHPUnit/Dusk)
+        run: |
+          sail artisan test
+
+      - name: Lint and Fix CSS Files
+        run: |
+          npm run lint
+
+      - name: Stop and Cleanup Services
+        run: |
+          sail down  # Stop Docker containers

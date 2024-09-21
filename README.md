@@ -33,43 +33,60 @@ These instructions will guide you through setting up the project on your local m
     - Enable Docker WSL2 integration and allow Ubuntu (or your chosen Linux version).
 
 2. **Project Setup**:
-    - Open your Terminal and clone the repository:
-      ```
-      git clone https://github.com/devblaze/ReservationProjectV2.git
-      ```
-    - Change directory to the project folder:
-      ```
-      cd ReservationProjectV2
-      ```
-    - Start the Docker environment with Laravel Sail:
-      ```
-      sail up -d
-      ```
-    - Install PHP dependencies:
-      ```bash
-      composer install
-      ```
-      Install NPM packages:
-      ```bash
-      npm install
-      ```
-      Set up your environment variables in .env file (use .env.example as a template).
-      Generate an application key:
-      ```bash
-      sail artisan key:generate
-      ```
-      Run migrations and seed the database (if applicable):
-      ```bash
-      sail artisan migrate --seed
-      ```
-    - Start the frontend server:
-      ```bash
-      npm run dev # In a separate terminal
-      ```
-    - Import the event model to Laravel Scout:
-      ```bash
-      sail artisan scout:import
-      ```
+   - Open your Terminal and clone the repository:
+     ```
+     git clone https://github.com/devblaze/ReservationProjectV2.git
+     ```
+   - Change directory to the project folder:
+     ```
+     cd ReservationProjectV2
+     ```
+   - You need to install the Laravel Sail.
+       ```bash
+       docker run --rm \
+           -u "$(id -u):$(id -g)" \
+           -v $(pwd):/var/www/html \
+           -w /var/www/html \
+           laravelsail/php81-composer:latest \
+           composer install --ignore-platform-reqs 
+       ```
+   - You can also run the following command to use `sail up -d` and not `./vendor/bin/sail up`.
+       ```bash
+       alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)' 
+       ```
+
+   - Start the Docker environment with Laravel Sail:
+     ```
+     sail up -d
+     ```
+  
+   - Install PHP dependencies:
+     ```bash
+     composer install
+     ```
+   - Install NPM packages:
+     ```bash
+     npm install
+     ```
+   - Set up your environment variables in .env file (use .env.example as a template).
+     Generate an application key:
+     ```bash
+     sail artisan key:generate
+     ```
+   - Run migrations and seed the database (if applicable):
+     ```bash
+     sail artisan migrate --seed
+     ```
+  
+   - Start the frontend server:
+     ```bash
+     npm run dev # In a separate terminal
+     ```
+  
+   - Import the event model to Laravel Scout:
+     ```bash
+     sail artisan scout:import
+     ```
 
 3. **Environment Configuration**:
     - Add the following lines to your `.env` file:
