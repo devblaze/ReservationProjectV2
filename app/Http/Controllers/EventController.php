@@ -166,15 +166,15 @@ class EventController extends Controller
 
         // Update the event details
         $event->update([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'start_date' => $validated['start_date'],
-            'end_date' => $validated['end_date'],
-            'location' => $validated['location'],
+            'title' => $request['title'],
+            'description' => $request['description'],
+            'start_date' => $request['start_date'],
+            'end_date' => $request['end_date'],
+            'location' => $request['location'],
         ]);
 
         // Decode the seat map from JSON to an array
-        $seatMap = json_decode($validated['seat_map'], true);
+        $seatMap = json_decode($request['seat_map'], true);
 
         // Fetch the existing seat IDs from the database, associated with this event
         $existingSeatIds = $event->seats->pluck('uid')->toArray();

@@ -53,6 +53,11 @@ These instructions will guide you through setting up the project on your local m
        alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)' 
        ```
 
+   - Generate a laravel app key.
+     ```bash
+     sail artisan key:generate
+     ```
+     
    - Start the Docker environment with Laravel Sail:
      ```
      sail up -d
