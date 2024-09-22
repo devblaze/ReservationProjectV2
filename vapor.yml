@@ -11,58 +11,16 @@ environments:
     build:
       # Install dependencies
       - 'composer install --no-dev'
-
-      # Cache events
-      - 'php artisan event:cache'
-
-      # Uncomment this if your project uses npm for frontend tasks
-      # - 'npm ci && npm run build && rm -rf node_modules'
+      - 'npm install'
+      - 'php artisan key:generate'
+      - 'docker compose up -d'
 
     # Optional deployment configuration
     deploy:
-      - 'php artisan migrate --force'
-      - 'php artisan config:cache'
-      - 'php artisan route:cache'
-
-  staging:
-    memory: 512
-    cli-memory: 256
-    runtime: 'php-8.2:al2'
-
-    # Build steps for staging (can mimic production or be simplified)
-    build:
-      - 'composer install'
-      - 'php artisan event:cache'
-
-      # Uncomment this if frontend assets are needed for staging
-      # - 'npm ci && npm run build && rm -rf node_modules'
-
-    deploy:
-      - 'php artisan migrate'
-      - 'php artisan config:cache'
-
-    # Optional:
-    database: staging-db  # Reference to the Vapor-managed database
-    domain: staging.reservationproject.com  # Placeholder for the staging domain
-
-  # Other possible environments:
-  # development, testing, demo, etc.
-
-hooks:
-  # Actions to be performed post-deployment in production
-  production:
-    post-deploy:
-      - 'php artisan scout:import "App\Models\Event"'
-
-  staging:
-    post-deploy:
-      - 'php artisan scout:flush "App\Models\Event"'
+      - 'php artisan migrate --seed'
       - 'php artisan scout:import "App\Models\Event"'
 
 databases:
   production-db:
-    provider: mysql
-    size: 1x
-  staging-db:
     provider: mysql
     size: 1x
