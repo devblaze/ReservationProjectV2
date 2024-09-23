@@ -60,11 +60,11 @@ These instructions will guide you through setting up the project on your local m
   
    - Install PHP dependencies:
      ```bash
-     composer install
+     sail composer install
      ```
    - Install NPM packages:
      ```bash
-     npm install
+     sail npm install
      ```
    - Set up your environment variables in .env file (use .env.example as a template).
      Generate an application key:
@@ -75,15 +75,15 @@ These instructions will guide you through setting up the project on your local m
      ```bash
      sail artisan migrate --seed
      ```
-  
-   - Start the frontend server:
-     ```bash
-     npm run dev # In a separate terminal
-     ```
-  
+
    - Import the event model to Laravel Scout:
      ```bash
      sail artisan scout:import
+     ```
+     
+   - Start the frontend server:
+     ```bash
+     sail npm run dev # In a separate terminal
      ```
 
 3. **Environment Configuration**:
