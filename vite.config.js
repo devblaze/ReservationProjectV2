@@ -20,8 +20,11 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
     server: {
+        host: '0.0.0.0',  // Bind Vite to all interfaces, so it will be accessible from the network.
+        port: 5173,        // Ensure Vite is running on port 5173 (or any other open port).
         hmr: {
-            host: 'localhost',
+            host: '192.168.4.1',  // Replace with the local IP address of your server / PC running Vite.
+            port: 5173,           // The same port for HMR.
         },
     },
     plugins: [
