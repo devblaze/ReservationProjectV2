@@ -1,19 +1,13 @@
 name: CI for Laravel Sail Application
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [ push ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest     # Use the latest version of Ubuntu for the build
+    runs-on: ubuntu-latest
 
     services:
-      mysql:                    # A MySQL service required for Laravel Sail
+      mysql:
         image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: password
@@ -22,17 +16,12 @@ jobs:
           MYSQL_PASSWORD: password
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     steps:
       - name: Checkout the codebase
         uses: actions/checkout@v3
 
-      - name: Set up PHP 8.1                    # Setup PHP
+      - name: Set up PHP 8.1
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
@@ -40,24 +29,28 @@ jobs:
           ini-values: post_max_size=256M, max_input_vars=5000
           coverage: none
 
-      - name: Set up Node.js 16.x                # Setup Node.js for npm
+      - name: Install PHP dependencies with Composer     # NEW STEP
+        run: |
+          composer install --no-dev --prefer-dist --optimize-autoloader
+
+      - name: Set up Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version: '16.x'
 
       - name: Setup environment and application key
         run: |
-          cp .env.example .env             # Set the environment variable file
-          php artisan key:generate      # Generate application key
+          cp .env.example .env
+          php artisan key:generate
 
       - name: Setup Docker Compose and Start Services
         run: |
-          docker compose up -d   # Start docker containers
+          docker compose up -d
 
       - name: Install NPM dependencies
         run: |
           npm install
-          npm run dev   # Build the frontend assets
+          npm run dev
 
       - name: Run database migrations and seeders
         run: |
@@ -77,4 +70,4 @@ jobs:
 
       - name: Stop and Cleanup Services
         run: |
-          docker compose down  # Stop Docker containers
+          docker compose down
