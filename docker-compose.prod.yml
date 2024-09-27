@@ -14,51 +14,66 @@ services:
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80" # HTTP entry point
     ports:
-      - "80:80"   # Expose Traefik on port 80 for HTTP
-      - "8080:8080" # Optional, expose Traefik dashboard
+      - "9001:80"   # Expose Traefik on port 80 for HTTP
+      - "9002:8080" # Optional, expose Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" # Enables Traefik to access Docker services
     networks:
-      - sail
+      - reservationproject
 
-  laravel.test:
-    image: sail-8.2/app
+  laravel.test:  # Nginx + PHP-FPM for Laravel
+    image: nginx:alpine
     environment:
       APP_ENV: production
       APP_DEBUG: 0
-      # Other production environment variables
+    depends_on:
+      - php
+    ports:
+      - 9000:80
+    volumes:
+      - ./public:/var/www/html  # Mount the Laravel `public` folder for Nginx
+      - ./docker/nginx:/etc/nginx/conf.d   # Mount custom nginx conf (if needed)
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel.rule=Host(`thessaloniki.duckdns.org`)" # Replace with your domain
-      - "traefik.http.services.laravel.loadbalancer.server.port=80" # Internal port used by the service
-    networks:
-      - sail
+      - "traefik.http.routers.laravel.rule=Host(`thessalonikiserver.duckdns.org`)" # Replace with your domain
+      - "traefik.http.services.laravel.loadbalancer.server.port=80"
     deploy:
       replicas: 3  # Run three instances for load balancing and high availability
       resources:
         limits:
           cpus: "0.5"
           memory: 256M
+    networks:
+      - reservationproject
+
+  php:  # PHP-FPM service for Laravel
+    image: devblaze/reservationproject:latest  # Use your custom-built Laravel + PHP-FPM image
+    volumes:
+      - .:/var/www/html   # Mount code into PHP Image
+    networks:
+      - reservationproject
+    expose:
+      - 9000  # FPM listens on port 9000 for incoming Nginx requests
 
   mysql:
-    image: mysql:8.0
+    image: 'mysql:8.0'
     environment:
       MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
     volumes:
       - 'sail-mysql:/var/lib/mysql'
     networks:
-      - sail
+      - reservationproject
 
   meilisearch:
-    image: getmeili/meilisearch:latest
+    image: 'getmeili/meilisearch:latest'
     environment:
       MEILI_ENV: production
     ports:
       - "7700:7700"  # Expose port 7700 for Meilisearch
     volumes:
-      - meili_data:/meili_data  # Persist data between restarts
+      - 'sail-meilisearch:/meili_data'  # Persist data between restarts
     networks:
-      - sail
+      - reservationproject
     deploy:
       replicas: 1  # You can scale if needed
       resources:
@@ -67,7 +82,7 @@ services:
           memory: 256M
 
 networks:
-  sail:
+  reservationproject:
     driver: bridge
 
 volumes:
