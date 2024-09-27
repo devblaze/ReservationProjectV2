@@ -1,8 +1,9 @@
-name: CI for Laravel Sail Application
+name: CI for Laravel Application with Docker
 
-on: [ push ]
+on: [push]
 
 jobs:
+  # Job 1: Build and test the application
   build:
     runs-on: ubuntu-latest
 
@@ -16,58 +17,60 @@ jobs:
           MYSQL_PASSWORD: password
         ports:
           - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - name: Checkout the codebase
         uses: actions/checkout@v3
 
-      - name: Set up PHP 8.1
-        uses: shivammathur/setup-php@v2
+      # Build the Docker image for the Laravel app using Dockerfile
+      - name: Build Docker image
+        run: docker build -t devblaze/reservationproject:latest .
+
+      # Run the newly created Docker container in detached mode and link to MySQL
+      - name: Run Laravel service container
+        run: docker run -d --rm --name laravel_app --network host devblaze/reservationproject:latest
+
+      # Wait for the app to start (use sleep or a health check)
+      - name: Sleep for container startup
+        run: sleep 15
+
+      # Run php artisan commands inside the container to ensure Laravel is working:
+      # This will ensure that Laravel, migrations, and seeding work correctly inside the container.
+      - name: Run php artisan tests inside the container
+        run: |
+          docker exec laravel_app php artisan migrate --seed
+          docker exec laravel_app php artisan scout:import "App\\Models\\Event"
+          docker exec laravel_app php artisan test
+
+      # Build and check the frontend (e.g., with Vite)
+      - name: Run Vite build
+        run: |
+          docker exec laravel_app npm run build
+
+      # Stop the services and clean things up
+      - name: Stop container after tests
+        run: docker stop laravel_app
+
+      - name: Tag docker image
+        run: docker tag devblaze/reservationproject:latest
+
+  # Job 2: Deploy - Build the image and push to Docker Hub if tests pass
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # This job will run only if the "build" job passes successfully
+
+    steps:
+      - name: Docker hub login
+        uses: docker/login-action@v3
         with:
-          php-version: 8.1
-          extensions: mbstring, bcmath, pdo_mysql, simplexml
-          ini-values: post_max_size=256M, max_input_vars=5000
-          coverage: none
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Install PHP dependencies with Composer     # NEW STEP
-        run: |
-          composer install --no-dev --prefer-dist --optimize-autoloader
-
-      - name: Set up Node.js 16.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-
-      - name: Setup environment and application key
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-
-      - name: Setup Docker Compose and Start Services
-        run: |
-          docker compose up -d
-
-      - name: Install NPM dependencies
-        run: |
-          npm install
-          npm run dev
-
-      - name: Run database migrations and seeders
-        run: |
-          php artisan migrate --seed
-
-      - name: Index the Models with Laravel Scout
-        run: |
-          php artisan scout:import "App\\Models\\Event"
-
-      - name: Run Test Suite (PHPUnit/Dusk)
-        run: |
-          php artisan test
-
-      - name: Lint and Fix CSS Files
-        run: |
-          npm run lint
-
-      - name: Stop and Cleanup Services
-        run: |
-          docker compose down
+      # Push the Docker image to Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: docker push devblaze/reservationproject:latest
