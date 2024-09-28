@@ -1,5 +1,17 @@
 #!/bin/bash
 
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install git -y
+
+sudo curl -fsSL https://get.docker.com -o install-docker.sh
+
+sudo ./install-docker.sh
+
+sudo usermod -aG docker $USER
+
+git clone https://github.com/devblaze/ReservationProjectV2.git
+
 # Run Composer update
 echo "Updating Composer dependencies..."
 ./vendor/bin/sail composer update

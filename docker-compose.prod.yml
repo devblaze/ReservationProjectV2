@@ -33,10 +33,12 @@ services:
       - 9000  # FPM listens on port 9000 for incoming FastCGI requests from Traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel.rule=Host(`thessalonikiserver.duckdns.org`)" # Replace with your domain
+      - "traefik.http.routers.laravel.rule=Host(`a636-129-222-69-83.ngrok-free.app`)" # Replace with your domain
       - "traefik.http.services.laravel.loadbalancer.server.port=9000"
       - "traefik.http.middlewares.laravel-php.replacepathregex.regex=^/static/(.*)"
       - "traefik.http.middlewares.laravel-php.replacepathregex.replacement=/var/www/html/public/$1"
+    deploy:
+      replicas: 3
 
   mysql:
     image: mysql:8.0
