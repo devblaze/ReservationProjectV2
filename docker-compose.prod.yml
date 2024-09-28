@@ -56,22 +56,23 @@ services:
       - 9000  # FPM listens on port 9000 for incoming Nginx requests
 
   mysql:
-    image: 'mysql:8.0'
+    image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
     volumes:
-      - 'sail-mysql:/var/lib/mysql'
+      - mysql:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - reservationproject
 
   meilisearch:
-    image: 'getmeili/meilisearch:latest'
+    image: getmeili/meilisearch:latest
     environment:
       MEILI_ENV: production
     ports:
       - "7700:7700"  # Expose port 7700 for Meilisearch
     volumes:
-      - 'sail-meilisearch:/meili_data'  # Persist data between restarts
+      - meilisearch:/meili_data  # Persist data between restarts
     networks:
       - reservationproject
     deploy:
@@ -86,5 +87,7 @@ networks:
     driver: bridge
 
 volumes:
-  sail-mysql:
+  mysql:
+    driver: local
+  meilisearch:
     driver: local
