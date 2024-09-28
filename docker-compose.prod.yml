@@ -14,9 +14,11 @@ services:
       - "--api.insecure=true" # Optional, allows Traefik to show its dashboard at :8080
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80" # HTTP entry point
+      - "--entrypoints.websecure.address=:443"  # HTTPS entry point (for SSL)
     ports:
-      - "9000:80"   # Expose Traefik on port 80 for HTTP
-      - "9001:8080" # Optional, expose Traefik dashboard
+      - "80:80" # Expose Traefik on port 80 for HTTP
+      - "443:443" # Expose HTTPS on port 443 for Traefik
+      - "8080:8080" # Optional, expose Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" # Enables Traefik to access Docker services
     networks:
