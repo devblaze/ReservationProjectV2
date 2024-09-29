@@ -114,10 +114,10 @@ export default {
                 seat_map: JSON.stringify(this.event.seat_map),
             };
 
-            axios.post(route('events.store'), eventData)
+            axios.post('/events', eventData)
                 .then(response => {
                     sendNotification({ message: 'Event created successfully!'}, 'success');
-                    router.visit(route('events.index'));
+                    router.visit('/events.index');
                 })
                 .catch(error => {
                     sendNotification({ message: 'There seems to be an error. Event was not created.'}, 'danger');

@@ -141,7 +141,7 @@ export default {
                 "event_id": this.event.id,
                 "selectedSeats": this.requestedSeatsToReserve
             }
-            axios.post(route('reservations.store'), storeRequestData)
+            axios.post('/reservations', storeRequestData)
                 .then(response => {
                     sendNotification({message: response.data}, 'success');
                 })
@@ -150,7 +150,7 @@ export default {
                 });
         },
         editEvent() {
-            router.get(route('events.edit', this.event.id), {
+            router.get(`/events/${this.event.id}/edit`, {
                 onSuccess: (page) => {
                     console.log('Navigation successful', page);
                 },
@@ -182,11 +182,11 @@ export default {
             this.requestedSeatsToReserve = JSON.parse(JSON.stringify(seats));
         },
         async deleteEvent() {
-            axios.delete(route('events.destroy', this.event.id))
+            axios.delete(`/events/${this.event.id}`)
                 .then(response => {
                     sendNotification({message: 'Event deleted successfully!'}, 'success');
                     setTimeout(() => {
-                        router.visit(route('events.index'));
+                        router.visit('/events');
                     }, 1000);
                 })
                 .catch(error => {

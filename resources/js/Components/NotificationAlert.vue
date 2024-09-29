@@ -27,39 +27,44 @@
     </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+    props: {
+        type: {
+            type: String as () => 'info' | 'warning' | 'success' | 'danger',
+            default: 'info',
+            validator: (value: string) => ['info', 'warning', 'success', 'danger'].includes(value),
+        },
+    },
     data() {
         return {
             show: true,
         };
     },
     computed: {
-        shade() {
+        shade(): string {
             switch (this.type) {
-                case "info":
-                    return "gray";
-                case "warning":
-                    return "yellow";
-                case "success":
-                    return "teal";
-                case "danger":
-                    return "red";
+                case 'info': return 'gray';
+                case 'warning': return 'yellow';
+                case 'success': return 'teal';
+                case 'danger': return 'red';
+                default: return 'gray';
             }
         },
-        wrapperColor() {
+        wrapperColor(): string {
             return `bg-${this.shade}-100 text-${this.shade}-900 border-${this.shade}-500`;
         },
-        svgColor() {
+        svgColor(): string {
             return `text-${this.shade}-500`;
         },
     },
-    props: {
-        type: {
-            type: String,
-            default: "info",
-            validator: (value) => ["info", "warning", "success", "danger"].indexOf(value) !== -1,
+    methods: {
+        closeNotification(): void {
+            this.show = false;
+            this.$emit('close');
         },
     },
-};
+});
 </script>

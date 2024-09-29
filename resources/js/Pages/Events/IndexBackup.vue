@@ -1,21 +1,21 @@
-<!--<script setup lang="ts">-->
-<!--import { onMounted, ref } from 'vue';-->
-<!--import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';-->
-<!--import { Head } from '@inertiajs/vue3';-->
-<!--import { TailwindPagination } from 'laravel-vue-pagination';-->
-<!--import EventsList from "@/Pages/Events/EventsList.vue";-->
-<!--const currentPage = ref(1); // Initialize with the default current page-->
+<script setup lang="ts">
+// import { onMounted, ref } from 'vue';
+// import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+// import { Head } from '@inertiajs/vue3';
+// import { TailwindPagination } from 'laravel-vue-pagination';
+// import EventsList from "@/Pages/Events/EventsList.vue";
+// const currentPage = ref(1); // Initialize with the default current page
+//
+// // Define the function to update the current page
+// const updatePage = (page: number) => {
+//     currentPage.value = page;
+//     // Fetch data for the new page here if needed
+// };
+//
+// defineProps({events: Object, user: Object})
+</script>
 
-<!--// Define the function to update the current page-->
-<!--const updatePage = (page: number) => {-->
-<!--    currentPage.value = page;-->
-<!--    // Fetch data for the new page here if needed-->
-<!--};-->
-
-<!--defineProps({events: Object, user: Object})-->
-<!--</script>-->
-
-<!--<template>-->
+<template>
 <!--    <Head title="Events"/>-->
 
 <!--    <AuthenticatedLayout>-->
@@ -83,4 +83,4 @@
 <!--            </div>-->
 <!--        </div>-->
 <!--    </AuthenticatedLayout>-->
-<!--</template>-->
+</template>

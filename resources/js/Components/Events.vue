@@ -34,7 +34,7 @@ export default {
         loadEvents(page = 1) {
             axios
                 // .get(`/api/events?page=${page}&search=${this.search}`)
-                .get(route('events.index', page), { search: this.search })
+                .get('/events', { search: this.search, page: this.page})
                 .then((response) => {
                     this.events = response.data;
                 });

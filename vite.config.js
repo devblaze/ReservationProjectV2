@@ -26,11 +26,9 @@ export default defineConfig(({ command }) => {
         server: {
             host: '0.0.0.0', // Bind to all interfaces
             port: 5173,      // Vite development server port
-            https: false,
             hmr: {
                 host: hmrHost.replace(/^https?:\/\//, ''), // Strip protocol
                 port: 5173,
-                protocol: 'wss', // Use secure WebSocket (WSS)
             },
         },
         plugins: [

@@ -9,7 +9,11 @@ import {Link} from '@inertiajs/vue3';
 import NotificationAlert from "@/Components/NotificationAlert.vue";
 import {notifications, removeNotification} from "@/Components/notificationService";
 
+// To keep track of toggling navigation dropdown
 const showingNavigationDropdown = ref(false);
+
+// Reactive current path to track active link
+const currentPath = window.location.href;  // Safely access window object
 </script>
 
 <template>
@@ -22,7 +26,7 @@ const showingNavigationDropdown = ref(false);
                         <div class="flex">
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
+                                <Link :href="'/dashboard'">
                                     <ApplicationLogo
                                         class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200"
                                     />
@@ -31,13 +35,13 @@ const showingNavigationDropdown = ref(false);
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <NavLink :href="'/dashboard'" :active="currentPath === '/dashboard'">
                                     Dashboard
                                 </NavLink>
-                                <NavLink :href="route('events.index')" :active="route().current('events.index')">
+                                <NavLink :href="'/events'" :active="currentPath === '/events'">
                                     Events
                                 </NavLink>
-                                <NavLink :href="route('events.create')" :active="route().current('events.create')">
+                                <NavLink :href="'/events/create'" :active="currentPath === '/events/create'">
                                     Create Event
                                 </NavLink>
                                 <!--                                <NavLink :href="route('reservations.create')" :active="route().current('reservations.create')">-->
@@ -75,10 +79,10 @@ const showingNavigationDropdown = ref(false);
                                     </template>
 
                                     <template #content>
-                                        <DropdownLink :href="route('reservations.index')"> Reservations
+                                        <DropdownLink :href="'/reservations'"> Reservations
                                         </DropdownLink>
-                                        <DropdownLink :href="route('profile.edit')"> Profile</DropdownLink>
-                                        <DropdownLink :href="route('logout')" method="post" as="button">
+                                        <DropdownLink :href="'/profile'"> Profile</DropdownLink>
+                                        <DropdownLink :href="'/logout'" method="post" as="button">
                                             Log Out
                                         </DropdownLink>
                                     </template>
@@ -124,17 +128,15 @@ const showingNavigationDropdown = ref(false);
                     :class="{ block: showingNavigationDropdown, hidden: !showingNavigationDropdown }"
                     class="sm:hidden"
                 >
-                    <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                            Dashboard
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('events.index')" :active="route().current('events.index')">
-                            Events
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('events.create')" :active="route().current('events.create')">
-                            Create Event
-                        </ResponsiveNavLink>
-                    </div>
+                    <ResponsiveNavLink :href="'/dashboard'" :active="currentPath === '/dashboard'">
+                        Dashboard
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="'/events'" :active="currentPath === '/events'">
+                        Events
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="'/events/create'" :active="currentPath === '/events/create'">
+                        Create Event
+                    </ResponsiveNavLink>
 
                     <!-- Responsive Settings Options -->
                     <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
@@ -142,13 +144,13 @@ const showingNavigationDropdown = ref(false);
                             <div class="font-medium text-base text-gray-800 dark:text-gray-200">
                                 {{ $page.props.auth.user.name }}
                             </div>
-                            <div class="font-medium text-sm text-gray-500">{{ $page.props.auth.user.displayName }}</div>
+                            <div class="font-medium text-sm text-gray-500">{{ $page.props.auth.user.name }}</div>
                         </div>
 
                         <div class="mt-3 space-y-1">
                             <div class="py-1"></div>
-                            <ResponsiveNavLink :href="route('profile.edit')"> Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink :href="route('logout')" method="post" as="button">
+                            <ResponsiveNavLink :href="'/profile/edit'"> Profile</ResponsiveNavLink>
+                            <ResponsiveNavLink :href="'/logout'" method="post" as="button">
                                 Log Out
                             </ResponsiveNavLink>
                         </div>

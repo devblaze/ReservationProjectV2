@@ -58,10 +58,10 @@ export default {
     methods: {
         searchEvents() {
             this.$inertia.get(
-                route('api.events.index', {
+                '/api/events', {
                     page: this.events.current_page,
                     search: this.search,
-                })
+                }
             );
         },
     },

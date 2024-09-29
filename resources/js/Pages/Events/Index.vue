@@ -153,7 +153,7 @@ export default {
         const searchEvents = async () => {
             // Use try-catch to handle any errors
             try {
-                const response = await axios.get(route('events.index'), {
+                const response = await axios.get('/events', {
                     params: { search: search.value },
                     headers: { Accept: 'application/json' }
                 });
