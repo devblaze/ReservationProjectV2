@@ -1,5 +1,5 @@
 # Use an official PHP runtime as a base image for production, with the PHP-FPM variant
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
 # Arguments for user (customizable)
 ARG user=www-data
@@ -35,6 +35,7 @@ RUN if ! id "$user" >/dev/null 2>&1; then \
     useradd -G www-data,root -u $uid -d /home/$user $user; \
 fi
 
+# Set the correct permissions
 RUN chown -R $user:$user /var/www/html
 
 # Copy application code into the container
@@ -44,16 +45,11 @@ COPY . /var/www/html
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --no-interaction --optimize-autoloader
 
-RUN npm update
-
 # Build frontend assets (only if using frontend frameworks like Vite/Vue)
 RUN npm install
 
 # Copy Laravel production environment file
 COPY .env.example /var/www/html/.env
-
-# Set the correct permissions
-RUN chown -R $user:$user /var/www/html
 
 # Change user and group (to non-root)
 USER $user
