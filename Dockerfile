@@ -52,7 +52,7 @@ RUN npm install
 COPY .env.example /var/www/html/.env
 
 # Change user and group (to non-root)
-USER $user
+#USER $user
 
 # Expose port 9000 for PHP-FPM
 EXPOSE 9000

@@ -32,7 +32,7 @@ services:
     networks:
       - reservationproject
     expose:
-      - 9000  # FPM listens on port 9000 for incoming FastCGI requests from Traefik
+      - 80  # FPM listens on port 9000 for incoming FastCGI requests from Traefik
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.laravel.rule=Host(`c110-129-222-69-83.ngrok-free.app`)" # Replace with your domain
