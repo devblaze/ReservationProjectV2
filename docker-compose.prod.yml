@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   watchtower:
     image: containrrr/watchtower
@@ -16,31 +17,30 @@ services:
       - "--entrypoints.web.address=:80" # HTTP entry point
       - "--entrypoints.websecure.address=:443"  # HTTPS entry point (for SSL)
     ports:
-      - "80:80" # Expose Traefik on port 80 for HTTP
-      - "443:443" # Expose HTTPS on port 443 for Traefik
-      - "8080:8080" # Optional, expose Traefik dashboard
+      - "80:80"   # HTTP
+      - "443:443" # HTTPS
+      - "8080:8080" # Traefik dashboard exposed
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" # Enables Traefik to access Docker services
     networks:
       - reservationproject
 
-  php:  # PHP-FPM service for Laravel
-    image: devblaze/reservationproject:latest  # Use your custom-built Laravel + PHP-FPM image
+  php:  # PHP-FPM Service
+    image: devblaze/reservationproject:latest
     volumes:
-      - .:/var/www/html   # Mount code into PHP Image
-      - ./public:/var/www/html/public  # Make sure to mount public folder for static assets
+      - .:/var/www/html            # Sync code (host -> container)
+      - ./public:/var/www/html/public  # Make sure public assets are properly mounted
     networks:
       - reservationproject
     expose:
-      - 80  # FPM listens on port 9000 for incoming FastCGI requests from Traefik
+      - 9000  # Expose PHP-FPM's FastCGI port to Traefik (which communicates via FastCGI)
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel.rule=Host(`c110-129-222-69-83.ngrok-free.app`)" # Replace with your domain
-      - "traefik.http.services.laravel.loadbalancer.server.port=9000"
-      - "traefik.http.middlewares.laravel-php.replacepathregex.regex=^/static/(.*)"
-      - "traefik.http.middlewares.laravel-php.replacepathregex.replacement=/var/www/html/public/$1"
+      - "traefik.http.routers.laravel.rule=Host(`c110-129-222-69-83.ngrok-free.app`)"  # Your domain or ngrok
+      - "traefik.http.routers.laravel.entrypoints=web"
+      - "traefik.http.services.laravel.loadbalancer.server.port=9000"  # FastCGI port inside the container
     deploy:
-      replicas: 3
+      replicas: 1  # If you're testing/demo purposes, you don't really need 3 replicas.
 
   mysql:
     image: mysql:8.0
@@ -66,11 +66,7 @@ services:
     networks:
       - reservationproject
     deploy:
-      replicas: 1  # You can scale if needed
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
+      replicas: 1  # Scale up if needed
 
 networks:
   reservationproject:
