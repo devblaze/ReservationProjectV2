@@ -19,7 +19,7 @@ services:
     ports:
       - "8080:80"     # Expose port 80 for HTTP traffic
       - "8443:443"   # Expose port 443 for HTTPS traffic
-      - "8080:8080" # Expose Traefik dashboard
+      - "8008:8080" # Expose Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock" # Provides Docker access to Traefik
     networks:
