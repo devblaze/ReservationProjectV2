@@ -7,40 +7,38 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
-    command: --cleanup --interval 300 # Check for updates every 5 minutes and remove old containers
+    command: --cleanup --interval 300
 
   traefik:
     image: traefik:v2.5
     command:
-      - "--api.insecure=true" # Optional, allows Traefik to show its dashboard at :8080
+      - "--api.insecure=true" # Dashboard access
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:80" # HTTP entry point
-      - "--entrypoints.websecure.address=:443"  # HTTPS entry point (for SSL)
+      - "--entrypoints.web.address=:80"  # Serves site on HTTP on port 80
+      - "--entrypoints.websecure.address=:443"  # Serves site on HTTPS, e.g. free SSL
     ports:
-      - "80:80"   # HTTP
-      - "443:443" # HTTPS
-      - "8080:8080" # Traefik dashboard exposed
+      - "8080:80"     # Expose port 80 for HTTP traffic
+      - "8443:443"   # Expose port 443 for HTTPS traffic
+      - "8080:8080" # Expose Traefik dashboard
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock" # Enables Traefik to access Docker services
+      - "/var/run/docker.sock:/var/run/docker.sock" # Provides Docker access to Traefik
     networks:
       - reservationproject
 
-  php:  # PHP-FPM Service
-    image: devblaze/reservationproject:latest
+  php:
+    image: devblaze/reservationproject:latest  # Updated image
     volumes:
-      - .:/var/www/html            # Sync code (host -> container)
-      - ./public:/var/www/html/public  # Make sure public assets are properly mounted
+      - .:/var/www/html
+      - ./public:/var/www/html/public # Host's public directory is mounted in the container
     networks:
       - reservationproject
     expose:
-      - 9000  # Expose PHP-FPM's FastCGI port to Traefik (which communicates via FastCGI)
+      - "9000"  # PHP-FPM listens on port 9000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel.rule=Host(`c110-129-222-69-83.ngrok-free.app`)"  # Your domain or ngrok
+      - "traefik.http.routers.laravel.rule=Host(`192.168.4.63`)"  # Traefik router for local IP
       - "traefik.http.routers.laravel.entrypoints=web"
-      - "traefik.http.services.laravel.loadbalancer.server.port=9000"  # FastCGI port inside the container
-    deploy:
-      replicas: 1  # If you're testing/demo purposes, you don't really need 3 replicas.
+      - "traefik.http.services.laravel.loadbalancer.server.port=9000"  # FastCGI port
 
   mysql:
     image: mysql:8.0
@@ -51,7 +49,6 @@ services:
       MYSQL_ROOT_PASSWORD: password
     volumes:
       - mysql:/var/lib/mysql
-      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - reservationproject
 
@@ -60,13 +57,11 @@ services:
     environment:
       MEILI_ENV: production
     ports:
-      - "7700:7700"  # Expose port 7700 for Meilisearch
+      - "7700:7700"
     volumes:
-      - meilisearch:/meili_data  # Persist data between restarts
+      - meilisearch:/meili_data
     networks:
       - reservationproject
-    deploy:
-      replicas: 1  # Scale up if needed
 
 networks:
   reservationproject:

@@ -3,6 +3,7 @@ name: ReservationProject
 
 environments:
   production:
+    database: reservationprojectdb
     memory: 1024
     cli-memory: 512
     runtime: 'php-8.2:al2'
@@ -13,7 +14,8 @@ environments:
       - 'composer install --no-dev'
 
       # Cache events
-      - 'php artisan event:cache'
+      - 'npm i'
+      - 'npm run build'
 
       # Uncomment this if your project uses npm for frontend tasks
       # - 'npm ci && npm run build && rm -rf node_modules'
@@ -28,8 +30,3 @@ hooks:
   production:
     post-deploy:
       - 'php artisan scout:import "App\Models\Event"'
-
-databases:
-  production-db:
-    provider: mysql
-    size: 1x

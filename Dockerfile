@@ -47,6 +47,7 @@ RUN composer install --no-dev --no-interaction --optimize-autoloader
 
 # Build frontend assets (only if using frontend frameworks like Vite/Vue)
 RUN npm install
+RUN npm run build
 
 # Copy Laravel production environment file
 COPY .env.example /var/www/html/.env
