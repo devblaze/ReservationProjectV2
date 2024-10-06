@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   watchtower:
     image: containrrr/watchtower
@@ -7,27 +9,13 @@ services:
     restart: always
     command: --cleanup --interval 300
 
-  traefik:
-    image: traefik:v2.5
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-    ports:
-      - "80:80"   # Traefik HTTP port
-      - "443:443"  # Traefik HTTPS port
-      - "8080:8080" # Traefik dashboard
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    networks:
-      - reservationproject
-
   php:
-    image: devblaze/reservationproject:latest
+    #    image: devblaze/reservationproject:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - .:/var/www/html
-      - ./public:/var/www/html/public
     networks:
       - reservationproject
     expose:
@@ -42,13 +30,10 @@ services:
       - .:/var/www/html  # Mount Laravel app here
     depends_on:
       - php
+    ports:
+      - "80:80"  # Directly expose port 80
     networks:
       - reservationproject
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=Host(`192.168.4.63`)"  # Adjust for your IP/Domain
-      - "traefik.http.routers.nginx.entrypoints=web"
-      - "traefik.http.services.nginx.loadbalancer.server.port=80"
 
   mysql:
     image: mysql:8.0
@@ -66,6 +51,7 @@ services:
     image: getmeili/meilisearch:latest
     environment:
       MEILI_ENV: production
+      MEILI_MASTER_KEY: e0ibi2csFnnnRZtwLvjDGQBZtgaiDCYrudz6P1YEmCw
     ports:
       - "7700:7700"
     volumes:

@@ -23,13 +23,6 @@ environments:
     deploy:
       - 'php artisan migrate --force'
       - 'php artisan config:cache'
-      - 'npm run dev'
-hooks:
-  # Actions to be performed post-deployment in production
-  production:
-    post-deploy:
-#      - 'php artisan scout:import "App\Models\Event"'
-      - 'npm run dev'
 
 databases:
   reservationprojectdb:

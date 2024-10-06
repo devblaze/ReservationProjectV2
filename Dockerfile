@@ -1,6 +1,8 @@
 # Set the base image for subsequent instructions
 FROM php:8.2-fpm
 
+RUN usermod -u 1000 www-data
+
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -24,16 +26,21 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # Remove default server definition
 RUN rm -rf /var/www/html
 
 # Copy existing application directory contents
-COPY . /var/www
+COPY . /var/www/html
 
 # Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www
+COPY --chown=www-data:www-data . /var/www/html
+
+# Ensure the storage and bootstrap/cache directories are writable
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
+#RUN chown -R www-data:www-data *
 
 # Change current user to www
 USER www-data
