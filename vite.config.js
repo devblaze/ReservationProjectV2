@@ -20,7 +20,7 @@ import vue from '@vitejs/plugin-vue';
 import * as fs from "node:fs";
 
 export default defineConfig(({ command }) => {
-    const hmrHost = process.env.VITE_HMR_HOST || '192.168.4.1'; // Local IP
+    const hmrHost = process.env.VITE_HMR_HOST || 'localhost'; // Local IP
 
     return {
         server: {
