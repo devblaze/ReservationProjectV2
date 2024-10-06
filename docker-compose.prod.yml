@@ -1,54 +1,51 @@
 version: '3.8'
 
 services:
+  # Watchtower: Monitors and updates your Docker containers
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
-    command: --cleanup --interval 300
+    command: --cleanup --interval 300  # Watchtower will check for image updates and perform cleanup
 
+  # Traefik: Handles routing and load balancing
   traefik:
     image: traefik:v2.5
     command:
-      - "--api.insecure=true" # Dashboard access
+      - "--api.insecure=true"
       - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"  # Serves site on HTTP on port 80
-      - "--entrypoints.websecure.address=:443"  # Serves site on HTTPS, e.g. free SSL
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
     ports:
-      - "8080:80"     # Expose port 80 for HTTP traffic
-      - "8443:443"   # Expose port 443 for HTTPS traffic
-      - "8008:8080" # Expose Traefik dashboard
+      - "8080:80"   # Traefik HTTP port
+      - "8443:443"  # Traefik HTTPS port
+      - "8008:8080" # Traefik dashboard
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock" # Provides Docker access to Traefik
+      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - reservationproject
 
+  # PHP-FPM service: Handles Laravel Backend API
   php:
-    image: devblaze/reservationproject:latest  # Updated image
+    image: devblaze/reservationproject:latest  # PHP-FPM Image from Docker Hub
     volumes:
       - .:/var/www/html
-      - ./public:/var/www/html/public # Host's public directory is mounted in the container
+      - ./public:/var/www/html/public  # Mount the public folder to sync with file changes
     networks:
       - reservationproject
     expose:
-      - "9000"  # PHP-FPM listens on port 9000
+      - "9000"  # Expose PHP-FPM port 9000
+    depends_on:
+      - mysql
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel.rule=Host(`192.168.4.63`)"  # Traefik router for local IP
+      - "traefik.http.routers.laravel.rule=Host(`192.168.4.63`)"  # Adjust with your domain or public IP
       - "traefik.http.routers.laravel.entrypoints=web"
-      - "traefik.http.services.laravel.loadbalancer.server.port=9000"  # FastCGI port
-  node:
-    image: devblaze/reservationprojectnode:latest  # Updated image
-    volumes:
-      - .:/var/www/html
-      - ./public:/var/www/html/public # Host's public directory is mounted in the container
-    networks:
-      - reservationproject
-    expose:
-      - "3000"
+      - "traefik.http.services.laravel.loadbalancer.server.port=9000"
 
+  # MySQL Database
   mysql:
     image: mysql:8.0
     environment:
@@ -61,6 +58,7 @@ services:
     networks:
       - reservationproject
 
+  # MeiliSearch Setup
   meilisearch:
     image: getmeili/meilisearch:latest
     environment:
@@ -68,16 +66,18 @@ services:
     ports:
       - "7700:7700"
     volumes:
-      - meilisearch:/meili_data
+      - meili_data:/meili_data
     networks:
       - reservationproject
 
 networks:
+  # Shared Docker network to enable inter-container communication
   reservationproject:
     driver: bridge
 
 volumes:
+  # Persisting MySQL and MeiliSearch Data
   mysql:
     driver: local
-  meilisearch:
+  meili_data:
     driver: local
