@@ -39,6 +39,15 @@ services:
       - "traefik.http.routers.laravel.rule=Host(`192.168.4.63`)"  # Traefik router for local IP
       - "traefik.http.routers.laravel.entrypoints=web"
       - "traefik.http.services.laravel.loadbalancer.server.port=9000"  # FastCGI port
+  node:
+    image: devblaze/reservationprojectnode:latest  # Updated image
+    volumes:
+      - .:/var/www/html
+      - ./public:/var/www/html/public # Host's public directory is mounted in the container
+    networks:
+      - reservationproject
+    expose:
+      - "3000"
 
   mysql:
     image: mysql:8.0

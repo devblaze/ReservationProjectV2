@@ -27,7 +27,7 @@ export default defineConfig(({ command }) => {
             host: '0.0.0.0', // Bind to all interfaces
             port: 5173,      // Vite development server port
             hmr: {
-                host: hmrHost.replace(/^https?:\/\//, ''), // Strip protocol
+                host: hmrHost,
                 port: 5173,
             },
         },

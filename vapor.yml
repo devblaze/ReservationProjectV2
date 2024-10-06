@@ -14,19 +14,23 @@ environments:
       - 'composer install --no-dev'
 
       # Cache events
-      - 'npm i'
-      - 'npm run build'
+      - 'php artisan event:cache'
 
       # Uncomment this if your project uses npm for frontend tasks
-      # - 'npm ci && npm run build && rm -rf node_modules'
+      - 'npm ci && npm run build && rm -rf node_modules'
 
     # Optional deployment configuration
     deploy:
-      - 'php artisan migrate --force'
+      - 'php artisan migrate:fresh --seed --force'
       - 'php artisan config:cache'
-      - 'php artisan route:cache'
 hooks:
   # Actions to be performed post-deployment in production
   production:
     post-deploy:
-      - 'php artisan scout:import "App\Models\Event"'
+#      - 'php artisan scout:import "App\Models\Event"'
+      - 'npm run dev'
+
+databases:
+  reservationprojectdb:
+    provider: mysql
+    size: 1x

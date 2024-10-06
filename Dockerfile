@@ -1,62 +1,43 @@
-# Use an official PHP runtime as a base image for production, with the PHP-FPM variant
+# Set the base image for subsequent instructions
 FROM php:8.2-fpm
 
-# Arguments for user (customizable)
-ARG user=www-data
-ARG uid=1000
-
-# Install system dependencies, including those needed for MySQL and Node.js
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip \
     curl \
+    unzip \
     git \
-    nodejs \
-    npm \
-    supervisor
+    libzip-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev && \
+    docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Install PHP extensions for Laravel
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd xml
-
-# Clean up the image to reduce size
+# Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Set working directory inside container
-WORKDIR /var/www/html
-
-# Create system user and set ownership (optional for some setups)
-RUN if ! id "$user" >/dev/null 2>&1; then \
-    useradd -G www-data,root -u $uid -d /home/$user $user; \
-fi
-
-# Set the correct permissions
-RUN chown -R $user:$user /var/www/html
-
-# Copy application code into the container
-COPY . /var/www/html
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN composer install --no-dev --no-interaction --optimize-autoloader
 
-# Build frontend assets (only if using frontend frameworks like Vite/Vue)
-RUN npm install
-RUN npm run build
+# Set working directory
+WORKDIR /var/www
 
-# Copy Laravel production environment file
-COPY .env.example /var/www/html/.env
+# Remove default server definition
+RUN rm -rf /var/www/html
 
-# Change user and group (to non-root)
-#USER $user
+# Copy existing application directory contents
+COPY . /var/www
 
-# Expose port 9000 for PHP-FPM
+# Copy existing application directory permissions
+COPY --chown=www-data:www-data . /var/www
+
+# Change current user to www
+USER www-data
+
+# Expose port 9000 and start php-fpm server
 EXPOSE 9000
-
-# Start PHP-FPM
 CMD ["php-fpm"]
