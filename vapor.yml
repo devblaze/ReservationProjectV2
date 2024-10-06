@@ -21,8 +21,9 @@ environments:
 
     # Optional deployment configuration
     deploy:
-      - 'php artisan migrate:fresh --seed --force'
+      - 'php artisan migrate --force'
       - 'php artisan config:cache'
+      - 'npm run dev'
 hooks:
   # Actions to be performed post-deployment in production
   production:

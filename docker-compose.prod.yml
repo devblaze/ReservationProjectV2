@@ -1,16 +1,12 @@
-version: '3.8'
-
 services:
-  # Watchtower: Monitors and updates your Docker containers
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
-    command: --cleanup --interval 300  # Watchtower will check for image updates and perform cleanup
+    command: --cleanup --interval 300
 
-  # Traefik: Handles routing and load balancing
   traefik:
     image: traefik:v2.5
     command:
@@ -19,33 +15,41 @@ services:
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
     ports:
-      - "8080:80"   # Traefik HTTP port
-      - "8443:443"  # Traefik HTTPS port
-      - "8008:8080" # Traefik dashboard
+      - "80:80"   # Traefik HTTP port
+      - "443:443"  # Traefik HTTPS port
+      - "8080:8080" # Traefik dashboard
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - reservationproject
 
-  # PHP-FPM service: Handles Laravel Backend API
   php:
-    image: devblaze/reservationproject:latest  # PHP-FPM Image from Docker Hub
+    image: devblaze/reservationproject:latest
     volumes:
       - .:/var/www/html
-      - ./public:/var/www/html/public  # Mount the public folder to sync with file changes
+      - ./public:/var/www/html/public
     networks:
       - reservationproject
     expose:
-      - "9000"  # Expose PHP-FPM port 9000
+      - "9000"
     depends_on:
       - mysql
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf  # Custom Nginx config
+      - .:/var/www/html  # Mount Laravel app here
+    depends_on:
+      - php
+    networks:
+      - reservationproject
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.laravel.rule=Host(`192.168.4.63`)"  # Adjust with your domain or public IP
-      - "traefik.http.routers.laravel.entrypoints=web"
-      - "traefik.http.services.laravel.loadbalancer.server.port=9000"
+      - "traefik.http.routers.nginx.rule=Host(`192.168.4.63`)"  # Adjust for your IP/Domain
+      - "traefik.http.routers.nginx.entrypoints=web"
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
 
-  # MySQL Database
   mysql:
     image: mysql:8.0
     environment:
@@ -58,7 +62,6 @@ services:
     networks:
       - reservationproject
 
-  # MeiliSearch Setup
   meilisearch:
     image: getmeili/meilisearch:latest
     environment:
@@ -70,14 +73,12 @@ services:
     networks:
       - reservationproject
 
-networks:
-  # Shared Docker network to enable inter-container communication
-  reservationproject:
-    driver: bridge
-
 volumes:
-  # Persisting MySQL and MeiliSearch Data
   mysql:
     driver: local
   meili_data:
     driver: local
+
+networks:
+  reservationproject:
+    driver: bridge
