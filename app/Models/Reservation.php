@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Reservation extends Model
 {
@@ -23,7 +25,7 @@ class Reservation extends Model
 
     /**
      * The reservations must belong to an event.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function event()
     {
@@ -32,7 +34,7 @@ class Reservation extends Model
 
     /**
      * The reservation must belong to a user.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
@@ -41,10 +43,10 @@ class Reservation extends Model
 
     /**
      * The reservation can have many reserved seats.
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function seats()
+    public function seat()
     {
-        return $this->hasMany(Seat::class);
+        return $this->hasMany(Seat::class, 'seat_id', 'uid');  // Explicitly define 'seat_id' -> 'uid' in seats table
     }
 }

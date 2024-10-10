@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Reservation;
+use http\Env\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,10 @@ class ReservationController extends Controller
      */
     public function index(Request $request)
     {
-        $reservations = Reservation::where('user_id', Auth::id())->get();
+        // Load the event together with the reservations
+        $reservations = Reservation::with('event') // Ensure 'event' relationship is eager-loaded
+        ->where('user_id', Auth::id())
+            ->get();
 
         // Check if it's an API request, and return JSON data if so
         if ($request->wantsJson()) {
@@ -39,39 +43,43 @@ class ReservationController extends Controller
             return response()->json(['error' => 'Event not found'], 404);
         }
 
-        // Validate incoming data
         $validated = $request->validate([
             'event_id' => 'required|exists:events,id',
-            'selectedSeats' => 'required|array|min:1'  // Ensure 'selectedSeats' is an array of at least 1 seat
+            'selectedSeats' => 'required|array|min:1',  // Ensure selectedSeats contains seat `uid` values
         ]);
 
         $eventId = $validated['event_id'];
-        $selectedSeats = $validated['selectedSeats'];
+
+        // Extract seat UIDs from request
+        $selectedSeatUids = array_map(function ($seat) {
+            return $seat['id'];  // ID here refers to the frontend-generated uid
+        }, $validated['selectedSeats']);
 
         // Check if any of the selected seats are already reserved
         $reservedSeats = Reservation::where('event_id', $eventId)
-            ->whereIn('seat_numbers', $selectedSeats)  // You can adjust this if structure differs
-            ->pluck('seat_numbers')
+            ->whereIn('seat_id', $selectedSeatUids)  // Using seat UIDs here
+            ->pluck('seat_id')
             ->toArray();
 
         if (!empty($reservedSeats)) {
             return response()->json([
                 'error' => 'Some seats already reserved',
-                'reservedSeats' => $reservedSeats
+                'reservedSeats' => $reservedSeats,
             ], 400);
         }
 
         // Reserve the selected seats
-        $reservation = Reservation::create([
-            'user_id' => Auth::id(),
-            'event_id' => $eventId,
-            'seat_numbers' => $selectedSeats,
-            'status' => 'confirmed'  // Default to confirmed
-        ]);
+        foreach ($selectedSeatUids as $seatUid) {
+            Reservation::create([
+                'user_id' => Auth::id(),
+                'event_id' => $eventId,
+                'seat_id' => $seatUid,  // Assign the seat UID as the foreign key
+                'status' => 'confirmed',
+            ]);
+        }
 
         return response()->json([
-            'message' => 'Seats have been reserved successfully',
-            'reservation' => $reservation
+            'message' => 'Seats reserved successfully.',
         ], 201);
     }
 
@@ -105,5 +113,20 @@ class ReservationController extends Controller
     public function destroy(Reservation $reservation)
     {
         //
+    }
+
+    public function cancel(Request $request, Reservation $reservation)
+    {
+        // Check if the reservation is not already cancelled
+        if ($reservation->status === 'cancelled') {
+            return back()->withErrors(['message' => 'Reservation is already cancelled.']);
+        }
+
+        // Cancel the reservation by updating its status
+        $reservation->update([
+            'status' => 'cancelled',
+        ]);
+
+        return response()->json(['message' => 'Reservation cancelled successfully.']);
     }
 }

@@ -15,10 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
-            $table->json('seat_id');
+            $table->string('seat_id');
             $table->decimal('price', 8, 2)->nullable();
             $table->enum('status', ['confirmed', 'pending', 'canceled'])->default('pending');
             $table->timestamps();
+
+            $table->foreign('seat_id')
+                ->references('uid')
+                ->on('seats')
+                ->onDelete('cascade');
         });
     }
 

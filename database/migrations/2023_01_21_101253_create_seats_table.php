@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('seats', function (Blueprint $table) {
-            $table->string('uid');             // Unique seat identifier (id) within the event.
+            $table->string('uid')->primary();             // Unique seat identifier (id) within the event.
             $table->string('label');           // Seat label (e.g., 'Table', 'Chair')
             $table->string('type');            // Seat type (table, chair, etc.)
             $table->boolean('booked')->default(false); // Whether the seat is booked or not
