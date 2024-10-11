@@ -51,6 +51,17 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm i
 RUN npm run build
 
+# Clear caches
+RUN php artisan config:clear
+RUN php artisan route:clear
+RUN php artisan view:clear
+
+# Remake config cache
+RUN php artisan config:cache
+
+# Migrate and seed database
+# RUN php artisan migrate --force
+
 # Change to 'www-data' user
 USER www-data
 
