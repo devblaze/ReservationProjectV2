@@ -1,9 +1,10 @@
-# Set the base image for subsequent instructions
+# Use official PHP 8.2 FPM image
 FROM php:8.2-fpm
 
+# Setup user to match your host's user ID
 RUN usermod -u 1000 www-data
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpng-dev \
@@ -16,39 +17,45 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
-    libpng-dev && \
-    docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    libpng-dev \
+    vim \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Install Node.js (use NodeSource's version for Debian-based distributions)
+# Install Node.js (use Node 16.x, compatible with your project)
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y nodejs
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# Create and set application directory
 WORKDIR /var/www/html
 
-# Remove default server definition
-RUN rm -rf /var/www/html
-
-# Copy existing application directory contents
+# Copy application to container
 COPY . /var/www/html
 
-# Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www/html
-
-# Ensure the storage and bootstrap/cache directories are writable
+# Ensure proper permissions for www-data user
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache
-#RUN chown -R www-data:www-data *
+RUN chmod -R 777 /var/www/html
 
-# Change current user to www
+# Remove any existing .env file
+RUN rm -f /var/www/html/.env
+
+# Copy .env.production to .env
+COPY .env.production /var/www/html/.env
+
+# Install project dependencies
+RUN composer install --no-dev --optimize-autoloader
+
+# Install NPM dependencies and compile assets
+RUN npm i
+RUN npm run build
+
+# Change to 'www-data' user
 USER www-data
 
-# Expose port 9000 and start php-fpm server
+# Expose port (9000 for PHP-FPM)
 EXPOSE 9000
+
+# Start PHP-FPM
 CMD ["php-fpm"]
