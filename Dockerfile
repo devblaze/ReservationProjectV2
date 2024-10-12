@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
     vim \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Install Node.js (use Node 16.x, compatible with your project)
+# Install Node.js (use Node 20.x)
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
@@ -41,14 +41,14 @@ RUN chmod -R 755 /var/www/html
 # Switch to www-data user
 USER www-data
 
-# Remove existing node_modules and package-lock.json
-RUN rm -rf node_modules package-lock.json
+# Remove existing node_modules
+RUN rm -rf node_modules
 
 # Install project dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 # Install NPM dependencies and compile assets
-RUN npm ci
+RUN npm install
 RUN npm run build
 
 # Clear caches and remake config cache
@@ -56,9 +56,6 @@ RUN php artisan config:clear
 RUN php artisan route:clear
 RUN php artisan view:clear
 RUN php artisan config:cache
-
-# Migrate and seed database
-# RUN php artisan migrate --force
 
 # Expose port (9000 for PHP-FPM)
 EXPOSE 9000
