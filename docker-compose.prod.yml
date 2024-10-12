@@ -1,5 +1,4 @@
 version: '3.8'
-env_file: .env.production
 
 services:
   traefik:
@@ -43,12 +42,12 @@ services:
       replicas: 3
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.php.rule=Host(`${APP_URL_HOST}`)"
+      - "traefik.http.routers.php.rule=Host(`${APP_URL_HOST:-localhost}`)"
       - "traefik.http.services.php.loadbalancer.server.port=9000"
       - "traefik.http.services.php.loadbalancer.sticky=true"
       - "traefik.http.services.php.loadbalancer.sticky.cookie.name=php_sticky"
       - "traefik.http.services.php.loadbalancer.sticky.cookie.secure=true"
-    env_file: '.env.production'
+    env_file: .env.production
     environment:
       - MEILISEARCH_HOST=http://meilisearch:7700
       - MEILISEARCH_KEY=${MEILISEARCH_KEY}
@@ -64,10 +63,10 @@ services:
       - reservationproject
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=Host(`${APP_URL_HOST}`)"
+      - "traefik.http.routers.nginx.rule=Host(`${APP_URL_HOST:-localhost}`)"
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
       - "com.centurylinklabs.watchtower.enable=false"
-    env_file: '.env.production'
+    env_file: .env.production
 
   mysql:
     image: mysql:8.0
@@ -82,7 +81,7 @@ services:
       - reservationproject
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
-    env_file: '.env.production'
+    env_file: .env.production
 
   meilisearch:
     image: getmeili/meilisearch:latest
@@ -97,12 +96,12 @@ services:
       - reservationproject
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
-    env_file: '.env.production'
+    env_file: .env.production
 
   ngrok:
     image: ngrok/ngrok:alpine
     environment:
-      NGROK_AUTHTOKEN: '${NGROK_AUTHTOKEN}'
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
     command: "http traefik:80"
     ports:
       - '4040:4040'
@@ -112,7 +111,7 @@ services:
       - traefik
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
-    env_file: '.env.production'
+    env_file: .env.production
 
   update-env:
     image: alpine
