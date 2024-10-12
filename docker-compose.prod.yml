@@ -8,8 +8,10 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -37,7 +39,6 @@ services:
       - "9000"
     depends_on:
       - mysql
-      - update-env
     deploy:
       replicas: 3
     labels:
@@ -97,33 +98,6 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     env_file: .env.production
-
-  ngrok:
-    image: ngrok/ngrok:alpine
-    environment:
-      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
-    command: "http traefik:80"
-    ports:
-      - '4040:4040'
-    networks:
-      - reservationproject
-    depends_on:
-      - traefik
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false"
-    env_file: .env.production
-
-  update-env:
-    image: alpine
-    volumes:
-      - .:/app
-      - ./update-env.sh:/update-env.sh
-    command: sh /update-env.sh
-    env_file: .env.production
-    networks:
-      - reservationproject
-    depends_on:
-      - ngrok
 
 volumes:
   mysql:
