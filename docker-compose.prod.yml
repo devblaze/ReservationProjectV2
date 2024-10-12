@@ -30,6 +30,7 @@ services:
     image: devblaze/reservationproject:latest
     volumes:
       - .:/var/www/html
+      - ./.env.production:/var/www/html/.env
     networks:
       - reservationproject
     expose:
@@ -116,16 +117,10 @@ services:
     image: alpine
     volumes:
       - .:/app
-    command: >
-      /bin/sh -c "
-      apk add --no-cache curl jq &&
-      while ! curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url' | grep https; do
-        echo 'Waiting for ngrok URL...'
-        sleep 5
-      done &&
-      NGROK_URL=$$(curl -s localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url' | grep https) &&
-      sed -i 's|APP_URL=.*|APP_URL='$$NGROK_URL'|g' /app/.env.production &&
-      sed -i 's|VITE_HMR_HOST=.*|VITE_HMR_HOST='$${NGROK_URL#https://}'|g' /app/.env.production"
+      - ./update-env.sh:/update-env.sh
+    command: sh /update-env.sh
+    networks:
+      - reservationproject
     depends_on:
       - ngrok
 
