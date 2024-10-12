@@ -43,7 +43,7 @@ services:
       replicas: 3
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.php.rule=Host(`*`)"
+      - "traefik.http.routers.php.rule=Host(`${VITE_HMR_HOST:-localhost}`)"
       - "traefik.http.services.php.loadbalancer.server.port=9000"
       - "traefik.http.services.php.loadbalancer.sticky=true"
       - "traefik.http.services.php.loadbalancer.sticky.cookie.name=php_sticky"
@@ -64,7 +64,7 @@ services:
       - reservationproject
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=Host(`*`)"
+      - "traefik.http.routers.nginx.rule=Host(`${VITE_HMR_HOST:-localhost}`)"
       - "traefik.http.routers.nginx.entrypoints=websecure"
       - "traefik.http.routers.nginx.tls=true"
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
