@@ -64,20 +64,22 @@ services:
       - "traefik.http.routers.nginx.rule=Host(`localhost`)"
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
       - "com.centurylinklabs.watchtower.enable=false"
+    env_file: '.env.production'
 
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_DATABASE: reservationprojectv2
-      MYSQL_USER: sail
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql:/var/lib/mysql
     networks:
       - reservationproject
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+    env_file: '.env.production'
 
   meilisearch:
     image: getmeili/meilisearch:latest
@@ -92,6 +94,7 @@ services:
       - reservationproject
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+    env_file: '.env.production'
 
   ngrok:
     image: ngrok/ngrok:alpine
@@ -106,6 +109,7 @@ services:
       - traefik
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+    env_file: '.env.production'
 
 volumes:
   mysql:
