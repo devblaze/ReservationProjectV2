@@ -38,6 +38,9 @@ COPY . /var/www/html
 RUN chown -R www-data:www-data /var/www/html
 RUN chmod -R 755 /var/www/html
 
+# Create .npm directory and set permissions
+RUN mkdir -p /var/www/.npm && chown -R www-data:www-data /var/www/.npm
+
 # Switch to www-data user
 USER www-data
 
@@ -48,6 +51,7 @@ RUN rm -rf node_modules
 RUN composer install --no-dev --optimize-autoloader
 
 # Install NPM dependencies and compile assets
+RUN npm cache clean --force
 RUN npm install
 RUN npm run build
 
