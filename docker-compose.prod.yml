@@ -20,8 +20,6 @@ services:
       - "9000"
     depends_on:
       - mysql
-    deploy:
-      replicas: 3
     env_file: .env.production
     environment:
       - MEILISEARCH_HOST=http://meilisearch:7700
