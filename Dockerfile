@@ -35,35 +35,30 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Ensure proper permissions for www-data user
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 777 /var/www/html
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html
 
-# Remove any existing .env file
-RUN rm -f /var/www/html/.env
+# Switch to www-data user
+USER www-data
 
-# Copy .env.production to .env
-COPY .env.production /var/www/html/.env
+# Remove existing node_modules and package-lock.json
+RUN rm -rf node_modules package-lock.json
 
 # Install project dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 # Install NPM dependencies and compile assets
-RUN npm i
+RUN npm ci
 RUN npm run build
 
-# Clear caches
+# Clear caches and remake config cache
 RUN php artisan config:clear
 RUN php artisan route:clear
 RUN php artisan view:clear
-
-# Remake config cache
 RUN php artisan config:cache
 
 # Migrate and seed database
 # RUN php artisan migrate --force
-
-# Change to 'www-data' user
-USER www-data
 
 # Expose port (9000 for PHP-FPM)
 EXPOSE 9000
