@@ -24,7 +24,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
-    command: --cleanup --interval 300
+    command: --rolling-restart --cleanup --interval 300
 
   php:
     image: devblaze/reservationproject:latest
