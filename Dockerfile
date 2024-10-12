@@ -38,8 +38,8 @@ COPY . /var/www/html
 COPY .env.production /var/www/html/.env
 
 # Ensure proper permissions for www-data user
-RUN chown -R www-data:www-data /var/www/html
-RUN chmod -R 755 /var/www/html
+# RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 777 /var/www/html
 
 # Create .npm directory and set permissions
 RUN mkdir -p /var/www/.npm && chown -R www-data:www-data /var/www/.npm
