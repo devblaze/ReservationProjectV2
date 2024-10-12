@@ -42,7 +42,7 @@ services:
       replicas: 3
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.php.rule=Host(`localhost`)"
+      - "traefik.http.routers.php.rule=Host(`${APP_URL_HOST}`)"
       - "traefik.http.services.php.loadbalancer.server.port=9000"
       - "traefik.http.services.php.loadbalancer.sticky=true"
       - "traefik.http.services.php.loadbalancer.sticky.cookie.name=php_sticky"
@@ -63,7 +63,7 @@ services:
       - reservationproject
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=Host(`localhost`)"
+      - "traefik.http.routers.nginx.rule=Host(`${APP_URL_HOST}`)"
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
       - "com.centurylinklabs.watchtower.enable=false"
     env_file: '.env.production'
@@ -74,7 +74,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql:/var/lib/mysql
     networks:

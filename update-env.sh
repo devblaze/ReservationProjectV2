@@ -14,14 +14,24 @@ for i in $(seq 1 30); do
     
     if [ ! -z "$NGROK_URL" ]; then
         echo "Ngrok URL found: $NGROK_URL"
+        NGROK_HOST=${NGROK_URL#https://}
+        
+        # Update APP_URL_HOST
+        sed -i "s|APP_URL_HOST=.*|APP_URL_HOST=$NGROK_HOST|g" /app/.env.production
+        
+        # Update APP_URL
         sed -i "s|APP_URL=.*|APP_URL=$NGROK_URL|g" /app/.env.production
-        sed -i "s|VITE_HMR_HOST=.*|VITE_HMR_HOST=${NGROK_URL#https://}|g" /app/.env.production
+        
+        # Update VITE_HMR_HOST
+        sed -i "s|VITE_HMR_HOST=.*|VITE_HMR_HOST=$NGROK_HOST|g" /app/.env.production
+        
         echo "Updated .env.production file"
         cat /app/.env.production
         
         # Export variables for other services to use
+        echo "APP_URL_HOST=$NGROK_HOST" >> /app/.env
         echo "APP_URL=$NGROK_URL" >> /app/.env
-        echo "VITE_HMR_HOST=${NGROK_URL#https://}" >> /app/.env
+        echo "VITE_HMR_HOST=$NGROK_HOST" >> /app/.env
         
         exit 0
     else

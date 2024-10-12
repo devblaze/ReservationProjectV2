@@ -34,9 +34,6 @@ WORKDIR /var/www/html
 # Copy application to container
 COPY . /var/www/html
 
-# Copy .env.production to .env
-# COPY .env.production /var/www/html/.env
-
 # Ensure proper permissions for www-data user
 # RUN chown -R www-data:www-data /var/www/html
 RUN chmod -R 777 /var/www/html
