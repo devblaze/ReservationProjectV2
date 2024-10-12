@@ -119,6 +119,7 @@ services:
       - .:/app
       - ./update-env.sh:/update-env.sh
     command: sh /update-env.sh
+    env_file: .env.production
     networks:
       - reservationproject
     depends_on:
