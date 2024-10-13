@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Inertia\Response;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
@@ -28,6 +29,9 @@ class EventController extends Controller
             $event->url = route('events.show', $event->id);
             return $event;
         });
+
+        // Log the events data
+        Log::info('Events data:', ['events' => $events->toArray()]);
 
         // Check if it's an API request, and return JSON data if so
         if ($request->wantsJson()) {
@@ -243,5 +247,22 @@ class EventController extends Controller
             'search' => $search,
         ]);
     }
-}
 
+    /**
+     * Generate a specified number of events using the factory.
+     *
+     * @param int $number
+     * @return JsonResponse
+     */
+    public function generateEvents(int $number): JsonResponse
+    {
+        $number = max(1, min($number, 100)); // Ensure number is between 1 and 100
+
+        $events = Event::factory()->count($number)->create();
+
+        return response()->json([
+            'message' => "{$number} events generated successfully!",
+            'events' => $events
+        ]);
+    }
+}
