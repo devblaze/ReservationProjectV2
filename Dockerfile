@@ -48,7 +48,7 @@ USER www-data
 RUN rm -rf node_modules
 
 # Install project dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+RUN composer install --no-dev --optimize-autoloader
 
 # Install NPM dependencies and compile assets
 RUN npm cache clean --force
