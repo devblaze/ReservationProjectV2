@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import {Link} from '@inertiajs/vue3';
-import NotificationAlert from "@/Components/NotificationAlert.vue";
+import NotificationAlert, { Notification } from "@/Components/NotificationAlert.vue";
 import {notifications, removeNotification} from "@/Components/notificationService";
 
 // To keep track of toggling navigation dropdown
@@ -14,6 +14,13 @@ const showingNavigationDropdown = ref(false);
 
 // Reactive current path to track active link
 const currentPath = window.location.href;  // Safely access window object
+
+const typedNotifications = ref<Notification[]>([]);
+
+// Assuming notifications is reactive, you might need to watch it
+watch(notifications, (newNotifications) => {
+  typedNotifications.value = newNotifications as Notification[];
+}, { immediate: true });
 </script>
 
 <template>
@@ -171,9 +178,9 @@ const currentPath = window.location.href;  // Safely access window object
             </main>
             <div class="fixed bottom-0 right-0 p-4 space-y-4 notification-container">
                 <NotificationAlert
-                    v-for="notification in notifications"
+                    v-for="notification in typedNotifications"
                     :key="notification.id"
-                    :type="notification.type"
+                    :notification="notification"
                     @close="removeNotification(notification.id)"
                 >
                     {{ notification.message }}
