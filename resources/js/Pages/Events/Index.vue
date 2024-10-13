@@ -75,18 +75,60 @@
                 </div>
 
                 <!-- Pagination component -->
-                <div class="container md:mb-8 pt-8 px-4 mx-auto flex justify-center select-none">
-                    <a class="block border px-4 py-2 rounded-l hover:bg-gray-200 text-gray-600" rel="prev" href="#">&larr;</a>
+                <div v-if="events.meta" class="container pt-8 pb-4 px-4 mx-auto flex justify-center select-none">
+                    <template v-if="events.meta">
+                        <a
+                            v-if="events.meta.current_page > 1"
+                            @click.prevent="changePage(events.links[0].url)"
+                            href="#"
+                            class="block border px-4 py-2 rounded-l hover:bg-gray-200 text-gray-600"
+                            rel="prev"
+                        >
+                            &larr;
+                        </a>
+                        <span
+                            v-else
+                            class="block border px-4 py-2 rounded-l text-gray-400 cursor-not-allowed"
+                        >
+                            &larr;
+                        </span>
 
-                    <a class="block border px-4 py-2 hover:bg-gray-200 text-gray-600" href="#">1</a>
-                    <a class="block border px-4 py-2 bg-indigo-500 text-white" href="#">2</a>
-                    <a class="block border px-4 py-2 hover:bg-gray-200 text-gray-600" href="#">3</a>
+                        <template v-for="(link, index) in events.links.slice(1, -1)" :key="index">
+                            <a
+                                v-if="link.url"
+                                @click.prevent="changePage(link.url)"
+                                href="#"
+                                :class="[
+                                    'block border px-4 py-2 hover:bg-gray-200 text-gray-600',
+                                    { 'bg-indigo-500 text-white': link.active }
+                                ]"
+                            >
+                                {{ link.label }}
+                            </a>
+                            <span
+                                v-else
+                                class="border px-4 py-2 cursor-not-allowed text-gray-400"
+                            >
+                                {{ link.label }}
+                            </span>
+                        </template>
 
-                    <span class="border px-4 py-2 cursor-not-allowed text-gray-400">&hellip;</span>
-
-                    <a class="block border px-4 py-2 hover:bg-gray-200 text-gray-600" href="#">10</a>
-
-                    <a class="block border px-4 py-2 rounded-r hover:bg-gray-200 text-gray-600" href="#" rel="next">&rarr;</a>
+                        <a
+                            v-if="events.meta.current_page < events.meta.last_page"
+                            @click.prevent="changePage(events.links[events.links.length - 1].url)"
+                            href="#"
+                            class="block border px-4 py-2 rounded-r hover:bg-gray-200 text-gray-600"
+                            rel="next"
+                        >
+                            &rarr;
+                        </a>
+                        <span
+                            v-else
+                            class="block border px-4 py-2 rounded-r text-gray-400 cursor-not-allowed"
+                        >
+                            &rarr;
+                        </span>
+                    </template>
                 </div>
             </div>
         </slot>
@@ -96,7 +138,7 @@
 
 <script>
 import {ref, watch, onMounted} from 'vue';
-import {usePage} from '@inertiajs/vue3';
+import {usePage, router} from '@inertiajs/vue3';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import axios from "axios";
 import { format, isSameDay } from 'date-fns';
@@ -148,39 +190,79 @@ export default {
     setup() {
         const {data, post, router} = usePage();
         const search = ref('');
-        const events = ref([]);
+        const events = ref({
+            data: [],
+            meta: null,
+            links: {}
+        });
 
-        const searchEvents = async () => {
-            // Use try-catch to handle any errors
+        const searchEvents = async (page = 1) => {
             try {
                 const response = await axios.get('/events', {
-                    params: { search: search.value },
+                    params: { 
+                        search: search.value,
+                        page: page
+                    },
                     headers: { Accept: 'application/json' }
                 });
 
-                events.value = response.data;
+                events.value = {
+                    data: response.data.data,
+                    meta: {
+                        current_page: response.data.current_page,
+                        last_page: response.data.last_page,
+                        total: response.data.total
+                    },
+                    links: response.data.links
+                };
             } catch (error) {
-                console.error(error);
+                console.error('Error fetching events:', error);
             }
         };
 
-        const cancelEvent = async (eventId) => {
-            try {
+        const generatePageNumbers = (meta) => {
+            const current = meta.current_page;
+            const last = meta.last_page;
+            const delta = 2;
+            const range = [];
+            const rangeWithDots = [];
+            let l;
 
-            } catch (error) {
-                console.error(error);
+            for (let i = 1; i <= last; i++) {
+                if (i === 1 || i === last || (i >= current - delta && i <= current + delta)) {
+                    range.push(i);
+                }
+            }
+
+            for (let i of range) {
+                if (l) {
+                    if (i - l === 2) {
+                        rangeWithDots.push(l + 1);
+                    } else if (i - l !== 1) {
+                        rangeWithDots.push('...');
+                    }
+                }
+                rangeWithDots.push(i);
+                l = i;
+            }
+
+            return rangeWithDots;
+        };
+
+        const generatePageUrl = (page) => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', page);
+            return url.toString();
+        };
+
+        const changePage = (url) => {
+            if (url) {
+                const page = new URL(url).searchParams.get('page');
+                searchEvents(page);
             }
         };
 
-        const reserveSeat = async (eventId) => {
-            try {
-
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        watch(search, searchEvents);
+        watch(search, () => searchEvents());
 
         onMounted(() => {
             searchEvents();
@@ -190,10 +272,12 @@ export default {
             search,
             events,
             searchEvents,
-            cancelEvent,
-            reserveSeat,
+            generatePageNumbers,
+            generatePageUrl,
             router,
+            changePage,
         };
     },
 };
 </script>
+

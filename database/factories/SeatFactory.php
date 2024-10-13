@@ -27,8 +27,8 @@ class SeatFactory extends Factory
             'type' => $this->faker->randomElement($types),  // 'table' or 'chair'
             'label' => $this->faker->randomElement($types),  // 'table' or 'chair'
             'booked' => $this->faker->boolean(20),  // 20% chance a seat is booked
-            'x' => $this->faker->numberBetween(50, 800),  // X-coordinate randomly assigned
-            'y' => $this->faker->numberBetween(50, 800),  // Y-coordinate randomly assigned
+            'x' => $this->faker->numberBetween(10, 1080),  // X-coordinate randomly assigned
+            'y' => $this->faker->numberBetween(10, 340),  // Y-coordinate randomly assigned
         ];
     }
 }

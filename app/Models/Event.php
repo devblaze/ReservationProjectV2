@@ -63,7 +63,7 @@ class Event extends Model
                 'label' => $seat->label, // Label like "Table", "Chair", etc.
                 'type' => $seat->type,   // Type of seat ("chair", "table", etc.)
                 'icon' => $seat->icon,   // Icon associated with this seat
-                'booked' => (bool) $seat->booked,  // True if booked, false otherwise
+                'booked' => (bool)$seat->booked,  // True if booked, false otherwise
                 'x' => $seat->x,         // X coordinate on seat map
                 'y' => $seat->y,         // Y coordinate on seat map
             ];

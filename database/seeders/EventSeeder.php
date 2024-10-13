@@ -15,8 +15,8 @@ class EventSeeder extends Seeder
     {
         // Seed an event and attach seats to it
         $events = Event::factory()
-            ->count(10)  // Generate 10 events
-            ->has(Seat::factory()->count(30))  // For each event, generate 30 seats
+            ->count(50)  // Generate 50 events
+            ->has(Seat::factory()->count(rand(10, 40)))  // For each event, generate between 10 and 40 seats
             ->create();
 
         if (app()->environment('local', 'staging')) {

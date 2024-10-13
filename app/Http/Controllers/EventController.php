@@ -64,16 +64,6 @@ class EventController extends Controller
             return response()->json(['message' => 'User not authenticated.'], 401);
         }
 
-        // Validate the request data
-//        $validated = $request->validate([
-//            'title' => 'required|string|max:255',
-//            'description' => 'required|string',
-//            'start_date' => 'required|date_format:Y-m-d\TH:i',
-//            'end_date' => 'required|date_format:Y-m-d\TH:i',
-//            'location' => 'required|string|max:255',
-//            'seat_map' => 'required|json',  // Expect seat_map as JSON array
-//        ]);
-
         // Create a new event with the validated data
         $event = Event::create([
             'organizer_id' => $user->id,
