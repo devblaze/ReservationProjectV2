@@ -61,10 +61,6 @@ RUN php artisan route:clear
 RUN php artisan view:clear
 RUN php artisan config:cache
 
-# Refresh the database schema, seed with initial data, and update the search index
-# RUN php artisan scout:flush "App\Models\Event"
-# RUN php artisan scout:import "App\Models\Event"
-
 # Expose port (9000 for PHP-FPM)
 EXPOSE 9000
 
