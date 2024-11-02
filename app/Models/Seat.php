@@ -22,7 +22,7 @@ class Seat extends Model
         'booked',
         'selected',
         'x',
-        'y',
+        'y'
     ];
 
     // Define relationship with Event
