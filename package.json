@@ -22,6 +22,7 @@
     },
     "dependencies": {
         "@inertiajs/inertia": "^0.11.1",
+        "@seatsio/seatsio-vue": "^4.1.0",
         "date-fns": "^2.30.0",
         "h": "^1.0.0",
         "laravel-vue-pagination": "^4.1.0",

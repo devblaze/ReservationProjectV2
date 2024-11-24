@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('venues', function (Blueprint $table) {
             $table->id();
+            $table->string('name'); // Name of the venue
+            $table->string('location'); // Location of the venue
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Associate venue with a user
             $table->timestamps();
         });
     }

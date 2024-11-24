@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('seats', function (Blueprint $table) {
             $table->string('uid')->primary();             // Unique seat identifier (id) within the event.
+            $table->foreignId('venue_id')->constrained()->onDelete('cascade');
             $table->string('label');           // Seat label (e.g., 'Table', 'Chair')
             $table->string('type');            // Seat type (table, chair, etc.)
             $table->boolean('booked')->default(false); // Whether the seat is booked or not
@@ -27,6 +28,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('seats');
+        Schema::enableForeignKeyConstraints();
     }
+
 };

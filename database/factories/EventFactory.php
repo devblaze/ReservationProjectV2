@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Venue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,11 +23,12 @@ class EventFactory extends Factory
     {
         return [
             'organizer_id' => User::factory(),
+            'venue_id' => Venue::factory(),
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
             'start_date' => $this->faker->dateTimeBetween('+2 days', '+2 week'),
             'end_date' => $this->faker->dateTimeBetween('+1 week', '+2 week'),
-            'location' => $this->faker->address,
+//            'location' => $this->faker->address,
             'is_canceled' => $this->faker->boolean,
         ];
     }

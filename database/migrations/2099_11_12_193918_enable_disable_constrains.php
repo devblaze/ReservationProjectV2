@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('seats', function (Blueprint $table) {
-            $table->foreignId('event_id')
-                ->constrained()
-                ->onDelete('cascade');
-        });
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -23,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('seats', function (Blueprint $table) {
-            $table->dropForeign(['event_id']);
-        });
+        Schema::disableForeignKeyConstraints();
     }
 };

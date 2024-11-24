@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Event;
 use App\Models\Seat;
+use App\Models\Venue;
 use Illuminate\Database\Seeder;
 
 class EventSeeder extends Seeder
@@ -13,14 +14,15 @@ class EventSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed an event and attach seats to it
-        $events = Event::factory()
-            ->count(50)  // Generate 50 events
-            ->has(Seat::factory()->count(rand(10, 40)))  // For each event, generate between 10 and 40 seats
-            ->create();
-
-        if (app()->environment('local', 'staging')) {
-            $events->searchable();  // Scout indexing
-        }
+        // Seed events with venues and seats
+        Event::factory()
+            ->count(50)
+            ->create()
+            ->each(function ($event) {
+                $venue = Venue::factory()->create(['user_id' => $event->organizer_id]);
+                Seat::factory()
+                    ->count(random_int(10, 40))
+                    ->create(['venue_id' => $venue->id]);
+            });
     }
 }

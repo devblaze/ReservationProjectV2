@@ -18,8 +18,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->string('location');
             $table->boolean('is_canceled')->default(false);
+            $table->foreignId('venue_id')->constrained('venues');
             $table->timestamps();
         });
     }

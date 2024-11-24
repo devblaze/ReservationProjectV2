@@ -10,25 +10,23 @@ class Seat extends Model
     use HasFactory;
 
     protected $primaryKey = 'uid';  // Declaring `uid` as the primary key
-    public $incrementing = false;  // Since 'uid' is not auto-incrementing
+    public $incrementing = false;   // Since 'uid' is not auto-incrementing
     protected $keyType = 'string';  // UID is a string
 
     protected $fillable = [
         'uid',
-        'event_id',
+        'venue_id',
         'label',
         'type',
-        'icon',
         'booked',
-        'selected',
         'x',
         'y'
     ];
 
-    // Define relationship with Event
-    public function event()
+    // Define relationship with Venue
+    public function venue()
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Venue::class, 'venue_id');
     }
 
     public function reservations()

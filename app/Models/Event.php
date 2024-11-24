@@ -21,7 +21,6 @@ class Event extends Model
         'description',
         'start_date',
         'end_date',
-        'location',
         'is_canceled',
         'organizer_id',
     ];
@@ -53,7 +52,7 @@ class Event extends Model
 
     public function generateSeatMap()
     {
-        if ($this->seats->isEmpty()){
+        if ($this->venue->seats->isEmpty()){
             return [];
         }
 

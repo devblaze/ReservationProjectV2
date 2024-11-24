@@ -51,6 +51,12 @@ watch(notifications, (newNotifications) => {
                                 <NavLink :href="'/events/create'" :active="currentPath === '/events/create'">
                                     Create Event
                                 </NavLink>
+                                <NavLink :href="'/venues'" :active="currentPath === '/venues'">
+                                    Venues
+                                </NavLink>
+                                <NavLink :href="'/venues/create'" :active="currentPath === '/venues/create'">
+                                    Create Venue
+                                </NavLink>
                                 <!--                                <NavLink :href="route('reservations.create')" :active="route().current('reservations.create')">-->
                                 <!--                                    Manage Events-->
                                 <!--                                </NavLink>-->
@@ -143,6 +149,12 @@ watch(notifications, (newNotifications) => {
                     </ResponsiveNavLink>
                     <ResponsiveNavLink :href="'/events/create'" :active="currentPath === '/events/create'">
                         Create Event
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="'/venues'" :active="currentPath === '/venues'">
+                        Venues
+                    </ResponsiveNavLink>
+                    <ResponsiveNavLink :href="'/venues/create'" :active="currentPath === '/venues/create'">
+                        Create Venue
                     </ResponsiveNavLink>
 
                     <!-- Responsive Settings Options -->

@@ -3,6 +3,7 @@
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\VenueController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -76,6 +77,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
     Route::get('/reservations/{reservation}/edit', [ReservationController::class, 'edit'])->name('reservations.edit');
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
-    Route::put('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');});
+    Route::put('/reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Venue Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::post('/venues', [VenueController::class, 'store'])->name('venues.store');
+    Route::get('/venues', [VenueController::class, 'index'])->name('venues.index');
+    Route::get('/venues/create', [VenueController::class, 'create'])->name('venues.create');
+    Route::get('/venues/{venue}', [VenueController::class, 'show'])->name('venues.show');
+    Route::get('/venues/{venue}/edit', [VenueController::class, 'edit'])->name('venues.edit');
+    Route::put('/venues/{venue}', [VenueController::class, 'update'])->name('venues.update');
+});
 
 require __DIR__.'/auth.php';
